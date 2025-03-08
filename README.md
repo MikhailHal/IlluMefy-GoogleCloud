@@ -14,6 +14,7 @@ Static Analysis: eslint
 
 ### Libraries
 ・Google Cloud Gmail API  
+・Google Cloud Local Auth  
 ・nodemailer
 
 ## Related URL
