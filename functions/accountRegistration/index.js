@@ -1,7 +1,8 @@
-const {onRequest} = require("firebase-functions/v2/https");
-const logger = require("firebase-functions/logger");
+const makeBaseHttpFunction = require("../base/index");
 
-exports.helloWorld = onRequest((request, response) => {
-  logger.info("Hello from Firebase!", {structuredData: true});
-  response.send("Hello from Firebase!");
-});
+exports.sendEmailVerificationCode = makeBaseHttpFunction(
+    "sendEmailVerificationCode",
+    (request, response) => {
+      response.send("Hello from Firebase!");
+    },
+);
