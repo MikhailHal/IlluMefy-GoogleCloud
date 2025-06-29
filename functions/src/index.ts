@@ -1,3 +1,8 @@
-/** 共通系API */
-// 死活監視用API
-export {health} from "./api/health/health";
+import {onRequest} from "firebase-functions/v2/https";
+import app from "./app";
+
+export const api = onRequest({
+    region: "asia-northeast1",
+}, app);
+
+export default app;
