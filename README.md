@@ -67,7 +67,9 @@ MVP features are being implemented for the upcoming beta release.
 ### Basic Information
 Runtime: Node.js 18+  
 Language: TypeScript 5  
-Framework: Express.js (migrating to Fastify in the future)  
+Framework: 
+* Express.js
+* CORS
 Database: Firestore (NoSQL)  
 Infrastructure: Firebase Functions → Cloud Run (for scaling)  
 Package Manager: npm  
