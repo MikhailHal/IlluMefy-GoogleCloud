@@ -137,8 +137,6 @@ Authorization: Bearer {idToken}
 - `GET /api/tags/popular` - Get trending tags
 - `POST /api/tags/apply` - Apply for new tag
 
-For complete API documentation, see [API_SPECIFICATION.md](./API_SPECIFICATION.md)
-
 ## 🤝 Contributing
 
 We welcome contributions to IlluMefy Backend! Here's how you can help:
