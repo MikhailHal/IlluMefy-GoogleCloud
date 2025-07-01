@@ -48,8 +48,6 @@ export interface Creator {
     };
     /** 直接設定されたタグIDの配列 */
     tags: string[];
-    /** 階層構造を含む全タグID（DP最適化用キャッシュ） */
-    tagHierarchyCache: string[];
     /** 作成日時 */
     createdAt: Timestamp;
     /** 更新日時 */
