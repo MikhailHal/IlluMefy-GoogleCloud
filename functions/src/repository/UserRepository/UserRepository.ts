@@ -1,4 +1,4 @@
-import {db} from "../../config/firebase";
+import {db, FieldValue} from "../../config/firebase";
 import {User, UserDocument} from "../../models/user";
 
 /**
@@ -64,5 +64,49 @@ export class UserRepository {
      */
     public async deleteUser(id: string): Promise<void> {
         await this.collection.doc(id).delete();
+    }
+
+    /**
+     * クリエイターをお気に入り追加する
+     *
+     * @param {string} userId お気に入り追加操作を行うユーザーid
+     * @param {string} creatorId お気に入り追加するクリエイターid
+     * @throws {Error} 既にお気に入り追加されていた場合
+     */
+    public async addFavoriteCreator(
+        userId: string,
+        creatorId: string
+    ): Promise<void> {
+        const user = await this.getUserById(userId);
+
+        if (user.favoriteCreators.includes(creatorId)) {
+            throw new Error("Creator is already in favorites");
+        }
+
+        await this.collection.doc(userId).update({
+            favoriteCreators: FieldValue.arrayUnion(creatorId),
+        });
+    }
+
+    /**
+     * クリエイターをお気に入りから削除する
+     *
+     * @param {string} userId お気に入り削除操作を行うユーザーid
+     * @param {string} creatorId お気に入りから削除するクリエイターid
+     * @throws {Error} 元々クリエイター情報がお気に入りリストに追加されていなかった場合
+     */
+    public async removeFavoriteCreator(
+        userId: string,
+        creatorId: string
+    ): Promise<void> {
+        const user = await this.getUserById(userId);
+
+        if (!user.favoriteCreators.includes(creatorId)) {
+            throw new Error("Creator is not in favorites");
+        }
+
+        await this.collection.doc(userId).update({
+            favoriteCreators: FieldValue.arrayRemove(creatorId),
+        });
     }
 }
