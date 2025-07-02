@@ -109,4 +109,60 @@ export class UserRepository {
             favoriteCreators: FieldValue.arrayRemove(creatorId),
         });
     }
+
+    /**
+     * 検索履歴を追加する（100件制限）
+     *
+     * @param {string} userId 検索履歴を追加するユーザーid
+     * @param {string[]} tagIds 検索に使用したタグIDの配列
+     */
+    public async addSearchHistory(
+        userId: string,
+        tagIds: string[]
+    ): Promise<void> {
+        const user = await this.getUserById(userId);
+        const searchEntry = {
+            tagIds: tagIds,
+            timestamp: FieldValue.serverTimestamp(),
+        };
+
+        let updatedHistory = [...user.searchTagHistories, searchEntry as any];
+
+        // 100件制限：古いものから削除
+        if (updatedHistory.length > 100) {
+            updatedHistory = updatedHistory.slice(-100);
+        }
+
+        await this.collection.doc(userId).update({
+            searchTagHistories: updatedHistory,
+        });
+    }
+
+    /**
+     * 閲覧履歴を追加する（100件制限）
+     *
+     * @param {string} userId 閲覧履歴を追加するユーザーid
+     * @param {string} creatorId 閲覧したクリエイターのid
+     */
+    public async addViewHistory(
+        userId: string,
+        creatorId: string
+    ): Promise<void> {
+        const user = await this.getUserById(userId);
+        const viewEntry = {
+            creatorId: creatorId,
+            timestamp: FieldValue.serverTimestamp(),
+        };
+
+        let updatedHistory = [...user.viewCreatorHistories, viewEntry as any];
+
+        // 100件制限：古いものから削除
+        if (updatedHistory.length > 100) {
+            updatedHistory = updatedHistory.slice(-100);
+        }
+
+        await this.collection.doc(userId).update({
+            viewCreatorHistories: updatedHistory,
+        });
+    }
 }
