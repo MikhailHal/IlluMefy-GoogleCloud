@@ -28,6 +28,24 @@ export class TagRepository {
     }
 
     /**
+     * 人気タグ取得
+     *
+     * @param {number} fetchCount 取得件数
+     * @return {Tag[]} 人気タグ一覧
+     */
+    public async getPopularTags(fetchCount: number): Promise<Tag[]> {
+        const snapshot = await this.collection
+            .orderBy("viewCount", "desc")
+            .limit(fetchCount)
+            .get();
+
+        return snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+        }) as Tag);
+    }
+
+    /**
      * タグの追加
      *
      * @param {TagDocument} tagDocument 登録するタグ
