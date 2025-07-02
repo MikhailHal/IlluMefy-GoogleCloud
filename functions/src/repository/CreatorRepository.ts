@@ -1,4 +1,4 @@
-import {Creator} from "../models/creator";
+import {Creator, CreatorDocument} from "../models/creator";
 import {db} from "../config/firebase";
 import type {Query} from "firebase-admin/firestore";
 
@@ -72,5 +72,40 @@ export class CreatorRepository {
             id: doc.id,
             ...doc.data(),
         } as Creator));
+    }
+
+    /**
+     * クリエイターの登録
+     *
+     * @param {CreatorDocument} creatorDocument 登録するクリエイター
+     * @return {string} 登録したクリエイターのid
+     */
+    public async addCreator(creatorDocument: CreatorDocument): Promise<string> {
+        const docRef = await this.collection.add(creatorDocument);
+        return docRef.id;
+    }
+
+    /**
+     * クリエイター情報の更新
+     *
+     * @param {string} id 更新対象のクリエイターid
+     * @param {Partial<CreatorDocument>} updates 更新するフィールド
+     * @return {void}
+     */
+    public async updateCreator(
+        id: string,
+        updates: Partial<CreatorDocument>
+    ): Promise<void> {
+        await this.collection.doc(id).update(updates);
+    }
+
+    /**
+     * クリエイターの削除
+     *
+     * @param {string} id 削除対象のクリエイターid
+     * @return {void}
+     */
+    public async deleteCreator(id: string): Promise<void> {
+        await this.collection.doc(id).delete();
     }
 }
