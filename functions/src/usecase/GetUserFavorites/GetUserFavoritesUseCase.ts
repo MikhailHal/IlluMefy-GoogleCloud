@@ -1,6 +1,6 @@
-import { Creator } from "../../models/creator";
-import { UserRepository } from "../../repository/UserRepository/UserRepository";
-import { CreatorRepository } from "../../repository/CreatorRepository/CreatorRepository";
+import {Creator} from "../../models/creator";
+import {UserRepository} from "../../repository/UserRepository/UserRepository";
+import {CreatorRepository} from "../../repository/CreatorRepository/CreatorRepository";
 
 /**
  * ユーザーのお気に入りクリエイター取得ユースケース
@@ -26,7 +26,7 @@ export class GetUserFavoritesUseCase {
     public async execute(userId: string): Promise<Creator[]> {
         const user = await this.userRepository.getUserById(userId);
         const creators: Creator[] = [];
-        
+
         for (const creatorId of user.favoriteCreators) {
             try {
                 const creator = await this.creatorRepository.getCreatorById(creatorId);
@@ -36,7 +36,7 @@ export class GetUserFavoritesUseCase {
                 console.warn(`Creator ${creatorId} not found, skipping`);
             }
         }
-        
+
         return creators;
     }
 }

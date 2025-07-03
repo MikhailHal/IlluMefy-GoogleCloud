@@ -1,4 +1,4 @@
-import { CreatorRepository } from "../../repository/CreatorRepository/CreatorRepository";
+import {CreatorRepository} from "../../repository/CreatorRepository/CreatorRepository";
 
 /**
  * クリエイター削除ユースケース
