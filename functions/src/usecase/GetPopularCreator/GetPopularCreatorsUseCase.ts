@@ -20,7 +20,7 @@ export class GetPopularCreatorsUseCase {
      * @param {number} fetchCount 取得件数
      * @return {Creator[]} 人気クリエイター
      */
-    public async getPopularCreators(fetchCount: number): Promise<Creator[]> {
+    public async execute(fetchCount: number): Promise<Creator[]> {
         let creators = await this.creatorRepository.getPopularCreators(fetchCount);
         return creators
     }
