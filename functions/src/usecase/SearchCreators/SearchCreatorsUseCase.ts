@@ -4,29 +4,30 @@ import {CreatorRepository} from "../../repository/CreatorRepository/CreatorRepos
 /**
  * クリエイター検索ユースケース
  *
- * 動的計画法(Dynamic Programming)を用いることで配下子タグをO(1)で取得。
- * それらタグを利用してAND検索を行う。
+ * フラット構造のタグによるAND検索を行う
  */
-export class SearcgCreatorsUseCase {
+export class SearchCreatorsUseCase {
     /**
      * コンストラクタ
      *
      * @param {CreatorRepository} creatorRepository クリエイターリポジトリ
      */
     constructor(
-        private creatorRepository: CreatorRepository,
+        private creatorRepository: CreatorRepository
     ) {}
 
     /**
-     * タグ情報を用いて全て満たすクリエイターを取得する
+     * タグIDを用いて全て満たすクリエイターを取得する
      *
+     * @param {string[]} tagIds 検索対象のタグIDの配列
      * @param {number} fetchCount 取得件数
      * @return {Creator[]} 指定したタグ条件を満たすクリエイター情報
      */
-    public async execute(fetchCount: number): Promise<Creator[]> {
-        return await this.creatorRepository.searchCreatorsByTags(
-            [],
-            fetchCount
-        );
+    public async execute(tagIds: string[], fetchCount: number): Promise<Creator[]> {
+        if (tagIds.length === 0) {
+            return [];
+        }
+
+        return await this.creatorRepository.searchCreatorsByTags(tagIds, fetchCount);
     }
 }
