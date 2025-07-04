@@ -1,3 +1,4 @@
+import { NotFoundCreatorError } from "../../base/error/NotFoundCreatorError";
 import {Creator} from "../../models/creator";
 import {CreatorRepository} from "../../repository/CreatorRepository/CreatorRepository";
 
@@ -22,6 +23,10 @@ export class GetCreatorByIdUseCase {
      * @throws {Error} クリエイターが見つからない場合
      */
     public async execute(id: string): Promise<Creator> {
-        return await this.creatorRepository.getCreatorById(id);
+        const creator = await this.creatorRepository.getCreatorById(id);
+        if (!creator) {
+            throw new NotFoundCreatorError();
+        }
+        return creator;
     }
 }
