@@ -47,18 +47,18 @@ export class UpdateCreatorUseCase {
             throw new ValidationError("Creator name cannot be empty");
         }
 
-        if (updates.iconImageUrl !== undefined) {
-            if (updates.iconImageUrl.trim() === "") {
-                throw new ValidationError("Icon image URL cannot be empty");
+        if (updates.profileImageUrl !== undefined) {
+            if (updates.profileImageUrl.trim() === "") {
+                throw new ValidationError("Profile image URL cannot be empty");
             }
             try {
-                new URL(updates.iconImageUrl);
+                new URL(updates.profileImageUrl);
             } catch {
-                throw new ValidationError("Invalid icon image URL format");
+                throw new ValidationError("Invalid profile image URL format");
             }
         }
 
-        if (updates.platforms !== undefined && updates.platforms.length === 0) {
+        if (updates.platforms !== undefined && Object.keys(updates.platforms).length === 0) {
             throw new ValidationError("At least one platform is required");
         }
 

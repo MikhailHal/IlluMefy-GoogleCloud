@@ -1,6 +1,9 @@
 import admin, {ServiceAccount} from "firebase-admin";
-import {InternalServerError} from "../../base/error/InternalServerError";
 import {FirebaseConfigError} from "../../base/error/FirebaseConfigError";
+import dotenv from "dotenv";
+
+// Load environment variables
+dotenv.config();
 
 const requiredEnvVars = [
     "FIREBASE_ADMIN_PROJECT_ID",
@@ -11,7 +14,7 @@ const requiredEnvVars = [
 // 必要な情報がenvファイルに含まれていることを確認
 for (const envVar of requiredEnvVars) {
     if (!process.env[envVar]) {
-        throw new InternalServerError();
+        throw new FirebaseConfigError(`Missing required environment variable: ${envVar}`);
     }
 }
 

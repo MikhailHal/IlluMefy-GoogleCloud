@@ -28,19 +28,19 @@ export class CreateCreatorUseCase {
             throw new ValidationError("Creator name is required");
         }
 
-        if (!creatorDocument.iconImageUrl || creatorDocument.iconImageUrl.trim() === "") {
-            throw new ValidationError("Icon image URL is required");
+        if (!creatorDocument.profileImageUrl || creatorDocument.profileImageUrl.trim() === "") {
+            throw new ValidationError("Profile image URL is required");
         }
 
-        if (!creatorDocument.platforms || creatorDocument.platforms.length === 0) {
+        if (!creatorDocument.platforms || Object.keys(creatorDocument.platforms).length === 0) {
             throw new ValidationError("At least one platform is required");
         }
 
         // URLフォーマットの簡易チェック
         try {
-            new URL(creatorDocument.iconImageUrl);
+            new URL(creatorDocument.profileImageUrl);
         } catch {
-            throw new ValidationError("Invalid icon image URL format");
+            throw new ValidationError("Invalid profile image URL format");
         }
 
         // タグの重複削除
