@@ -1,4 +1,4 @@
-import { NotFoundCreatorError } from "../../base/error/NotFoundCreatorError";
+import {NotFoundCreatorError} from "../../base/error/NotFoundCreatorError";
 import {Creator} from "../../models/creator";
 import {CreatorRepository} from "../../repository/CreatorRepository/CreatorRepository";
 
