@@ -29,4 +29,5 @@ export enum AppDetailCode {
     Unauthorized = "UNAUTHORIZED",
     Forbidden = "FORBIDDEN",
     Conflict = "CONFLICT",
+    FirebaseConfigError = "FIREBASE_CONFIG_ERROR",
 }

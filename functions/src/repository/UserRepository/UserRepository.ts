@@ -1,4 +1,4 @@
-import {db, FieldValue} from "../../config/firebase";
+import {db, FieldValue} from "../../config/firebase/firebase";
 import {User, UserDocument} from "../../models/user";
 
 /**

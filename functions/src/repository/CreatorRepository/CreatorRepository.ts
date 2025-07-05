@@ -1,5 +1,5 @@
 import {Creator, CreatorDocument} from "../../models/creator";
-import {db} from "../../config/firebase";
+import {db} from "../../config/firebase/firebase";
 import type {Query} from "firebase-admin/firestore";
 
 /**
