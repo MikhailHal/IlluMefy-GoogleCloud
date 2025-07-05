@@ -25,4 +25,8 @@ export class AppError extends Error {
 export enum AppDetailCode {
     InternalError = "INTERNAL_ERROR",
     NotFound = "NOT_FOUND",
+    ValidationError = "VALIDATION_ERROR",
+    Unauthorized = "UNAUTHORIZED",
+    Forbidden = "FORBIDDEN",
+    Conflict = "CONFLICT",
 }
