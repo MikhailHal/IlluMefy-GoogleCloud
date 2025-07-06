@@ -1,41 +1,14 @@
-import admin, {ServiceAccount} from "firebase-admin";
+import admin from "firebase-admin";
 import {FirebaseConfigError} from "../../base/error/FirebaseConfigError";
-import dotenv from "dotenv";
-
-// Load environment variables
-dotenv.config();
-
-const requiredEnvVars = [
-    "FIREBASE_ADMIN_PROJECT_ID",
-    "FIREBASE_ADMIN_PRIVATE_KEY",
-    "FIREBASE_ADMIN_CLIENT_EMAIL",
-];
-
-// 必要な情報がenvファイルに含まれていることを確認
-for (const envVar of requiredEnvVars) {
-    if (!process.env[envVar]) {
-        throw new FirebaseConfigError(`Missing required environment variable: ${envVar}`);
-    }
-}
-
-const serviceAccount = {
-    type: "service_account",
-    project_id: process.env.FIREBASE_ADMIN_PROJECT_ID,
-    private_key:
-        process.env.FIREBASE_ADMIN_PRIVATE_KEY &&
-        process.env.FIREBASE_ADMIN_PRIVATE_KEY.replace(/\\n/g, "\n"),
-    client_email: process.env.FIREBASE_ADMIN_CLIENT_EMAIL,
-};
 
 try {
     if (!admin.apps.length) {
-        admin.initializeApp({
-            credential: admin.credential.cert(serviceAccount as ServiceAccount),
-        });
+        admin.initializeApp();
     }
 } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
     throw new FirebaseConfigError(
-        "Firebase config initialization error .In detail: ${error.message}"
+        `Firebase config initialization error. Detail: ${errorMessage}`
     );
 }
 
