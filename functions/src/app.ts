@@ -4,6 +4,8 @@ import cors from "cors";
 // handlerインポート
 import healthRouter from "./api/health/health.router";
 import creatorsRouter from "./api/creators/creators.router";
+import tagsRouter from "./api/tags/tags.router";
+import usersRouter from "./api/users/users.router";
 import {AppDetailCode, AppError} from "./base/error/AppError";
 
 const app = express();
@@ -21,6 +23,8 @@ app.use(express.urlencoded({extended: true}));
 // ルーティング設定
 app.use("/health", healthRouter);
 app.use("/creators", creatorsRouter);
+app.use("/tags", tagsRouter);
+app.use("/users", usersRouter);
 
 // 404エラーハンドリング
 app.use((_req: Request, res: Response) => {
