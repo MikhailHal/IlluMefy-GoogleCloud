@@ -3,7 +3,6 @@ import {GetPopularCreatorsUseCase} from "../../usecase/GetPopularCreator/GetPopu
 import {SearchCreatorsUseCase} from "../../usecase/SearchCreators/SearchCreatorsUseCase";
 import {GetCreatorByIdUseCase} from "../../usecase/GetCreatorById/GetCreatorByIdUseCase";
 import {CreatorRepository} from "../../repository/CreatorRepository/CreatorRepository";
-import {NotFoundError} from "../../base/error/NotFoundError";
 
 export const popularCreatorHandler = async (
     req: Request,
@@ -93,10 +92,6 @@ export const getCreatorByIdHandler = async (
         );
 
         const creator = await getCreatorByIdUseCase.execute(id);
-        if (!creator) {
-            throw new NotFoundError("Creator not found");
-        }
-
         res.json({
             data: creator,
         });

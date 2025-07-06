@@ -28,10 +28,10 @@ export class GetUserFavoritesUseCase {
         const creators: Creator[] = [];
 
         for (const creatorId of user.favoriteCreators) {
-            try {
-                const creator = await this.creatorRepository.getCreatorById(creatorId);
+            const creator = await this.creatorRepository.getCreatorById(creatorId);
+            if (creator) {
                 creators.push(creator);
-            } catch (error) {
+            } else {
                 // クリエイターが削除されている場合はスキップ
                 console.warn(`Creator ${creatorId} not found, skipping`);
             }

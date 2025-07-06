@@ -30,14 +30,13 @@ export class CreatorRepository {
      * idを用いたクリエイター検索
      *
      * @param {string} id 検索対象のクリエイターid
-     * @return {Creator} idに紐づいたクリエイター
-     * @throws {Error} クリエイターが見つからない場合
+     * @return {Creator | null} idに紐づいたクリエイター、見つからない場合はnull
      */
-    public async getCreatorById(id: string): Promise<Creator> {
+    public async getCreatorById(id: string): Promise<Creator | null> {
         const doc = await this.collection.doc(id).get();
 
         if (!doc.exists) {
-            throw new Error(`Creator with id ${id} not found`);
+            return null;
         }
 
         return {
