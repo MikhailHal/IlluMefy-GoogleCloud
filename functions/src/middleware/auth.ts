@@ -3,7 +3,7 @@ import {auth} from "../config/firebase/firebase";
 import {DecodedIdToken} from "firebase-admin/auth";
 import {UnauthorizedError} from "../base/error/UnauthorizedError";
 
-interface AuthRequest extends Request {
+export interface AuthRequest extends Request {
     user?: DecodedIdToken;
 }
 export const verifyAuth = async (
