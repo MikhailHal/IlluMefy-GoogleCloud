@@ -7,9 +7,9 @@ export class ValidationError extends AppError {
     /**
      * コンストラクタ
      * @param {string} message エラーメッセージ
-     * @param {any} details 詳細情報（フィールド名、期待値など）
+     * @param {Record<string, unknown>} details 詳細情報（フィールド名、期待値など）
      */
-    constructor(message: string, public details?: any) {
+    constructor(message: string, public details?: Record<string, unknown>) {
         super(
             message,
             400,

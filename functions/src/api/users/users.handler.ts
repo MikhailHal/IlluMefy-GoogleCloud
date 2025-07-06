@@ -4,6 +4,8 @@ import {GetUserFavoritesUseCase} from "../../usecase/GetUserFavorites/GetUserFav
 import {
     AddFavoriteCreatorUseCase,
 } from "../../usecase/AddFavoriteCreator/AddFavoriteCreatorUseCase";
+import {AddSearchHistoryUseCase} from "../../usecase/AddSearchHistory/AddSearchHistoryUseCase";
+import {AddViewHistoryUseCase} from "../../usecase/AddViewHistory/AddViewHistoryUseCase";
 import {UserRepository} from "../../repository/UserRepository/UserRepository";
 import {CreatorRepository} from "../../repository/CreatorRepository/CreatorRepository";
 
@@ -105,6 +107,82 @@ export const removeFavoriteHandler = async (
 
         res.status(200).json({
             message: "Favorite removed successfully",
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const addSearchHistoryHandler = async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction,
+): Promise<void> => {
+    try {
+        if (!req.user) {
+            res.status(401).json({
+                error: {
+                    message: "Unauthorized",
+                },
+            });
+            return;
+        }
+
+        const {tagIds} = req.body;
+        if (!tagIds || !Array.isArray(tagIds) || tagIds.length === 0) {
+            res.status(400).json({
+                error: {
+                    message: "Tag IDs array is required",
+                },
+            });
+            return;
+        }
+
+        const addSearchHistoryUseCase = new AddSearchHistoryUseCase(
+            new UserRepository()
+        );
+
+        await addSearchHistoryUseCase.execute(req.user.uid, tagIds);
+        res.json({
+            message: "Search history recorded successfully",
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const addViewHistoryHandler = async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction,
+): Promise<void> => {
+    try {
+        if (!req.user) {
+            res.status(401).json({
+                error: {
+                    message: "Unauthorized",
+                },
+            });
+            return;
+        }
+
+        const {creatorId} = req.params;
+        if (!creatorId) {
+            res.status(400).json({
+                error: {
+                    message: "Creator ID is required",
+                },
+            });
+            return;
+        }
+
+        const addViewHistoryUseCase = new AddViewHistoryUseCase(
+            new UserRepository()
+        );
+
+        await addViewHistoryUseCase.execute(req.user.uid, creatorId);
+        res.json({
+            message: "View history recorded successfully",
         });
     } catch (error) {
         next(error);

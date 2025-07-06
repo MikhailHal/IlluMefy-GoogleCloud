@@ -6,6 +6,7 @@ import healthRouter from "./api/health/health.router";
 import creatorsRouter from "./api/creators/creators.router";
 import tagsRouter from "./api/tags/tags.router";
 import usersRouter from "./api/users/users.router";
+import adminRouter from "./api/admin/admin.router";
 import {AppDetailCode, AppError} from "./base/error/AppError";
 
 const app = express();
@@ -25,6 +26,7 @@ app.use("/health", healthRouter);
 app.use("/creators", creatorsRouter);
 app.use("/tags", tagsRouter);
 app.use("/users", usersRouter);
+app.use("/admin", adminRouter);
 
 // 404エラーハンドリング
 app.use((_req: Request, res: Response) => {

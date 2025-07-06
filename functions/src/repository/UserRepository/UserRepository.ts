@@ -1,5 +1,6 @@
 import {db, FieldValue} from "../../config/firebase/firebase";
 import {User, UserDocument} from "../../models/user";
+import type {Timestamp} from "firebase-admin/firestore";
 
 /**
  * ユーザーデータの基本操作に関するクラス
@@ -126,7 +127,10 @@ export class UserRepository {
             timestamp: FieldValue.serverTimestamp(),
         };
 
-        let updatedHistory = [...user.searchTagHistories, searchEntry as any];
+        let updatedHistory = [...user.searchTagHistories, searchEntry as unknown as {
+            tagIds: string[];
+            timestamp: Timestamp;
+        }];
 
         // 100件制限：古いものから削除
         if (updatedHistory.length > 100) {
@@ -154,7 +158,10 @@ export class UserRepository {
             timestamp: FieldValue.serverTimestamp(),
         };
 
-        let updatedHistory = [...user.viewCreatorHistories, viewEntry as any];
+        let updatedHistory = [...user.viewCreatorHistories, viewEntry as unknown as {
+            creatorId: string;
+            timestamp: Timestamp;
+        }];
 
         // 100件制限：古いものから削除
         if (updatedHistory.length > 100) {
