@@ -57,21 +57,27 @@ export class CreatorRepository {
         tagIds: string[],
         fetchCount: number
     ): Promise<Creator[]> {
-        let query: Query = this.collection;
-        // 各タグに対してarray-containsを追加（AND条件）
-        tagIds.forEach((tagId) => {
-            query = query.where("tags", "array-contains", tagId);
-        });
+        // 最初のタグのみでFirestore検索
+        const query: Query = this.collection.where("tags", "array-contains", tagIds[0]);
 
         const snapshot = await query
             .orderBy("favoriteCount", "desc")
-            .limit(fetchCount)
+            .limit(fetchCount * 3) // 多めに取得してクライアント側でフィルタ
             .get();
 
-        return snapshot.docs.map((doc) => ({
+        const allResults = snapshot.docs.map((doc) => ({
             id: doc.id,
             ...doc.data(),
         } as Creator));
+
+        // 複数タグの場合はクライアント側でANDフィルタ
+        if (tagIds.length === 1) {
+            return allResults;
+        }
+
+        return allResults.filter((creator) =>
+            tagIds.every((tagId) => creator.tags.includes(tagId))
+        ).slice(0, fetchCount);
     }
 
     /**
