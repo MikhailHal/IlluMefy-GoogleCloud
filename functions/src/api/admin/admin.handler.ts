@@ -5,6 +5,8 @@ import {UpdateCreatorUseCase} from "../../domain/usecase/UpdateCreator/UpdateCre
 import {DeleteCreatorUseCase} from "../../domain/usecase/DeleteCreator/DeleteCreatorUseCase";
 import {CreatorRepository} from "../../repository/CreatorRepository/CreatorRepository";
 import {Timestamp} from "../../config/firebase/firebase";
+import {createCreatorBodySchema, updateCreatorBodySchema, creatorIdParamsSchema} from "../../domain/schema/admin.schema";
+import {ZodError} from "zod";
 
 export const createCreatorHandler = async (
     req: AuthRequest,
@@ -12,12 +14,14 @@ export const createCreatorHandler = async (
     next: NextFunction,
 ): Promise<void> => {
     try {
+        const body = createCreatorBodySchema.parse(req.body);
+
         const createCreatorUseCase = new CreateCreatorUseCase(
             new CreatorRepository()
         );
 
         const creatorDocument = {
-            ...req.body,
+            ...body,
             createdAt: Timestamp.now(),
             updatedAt: Timestamp.now(),
         };
@@ -30,6 +34,18 @@ export const createCreatorHandler = async (
             message: "Creator created successfully",
         });
     } catch (error) {
+        if (error instanceof ZodError) {
+            res.status(400).json({
+                error: {
+                    message: "Invalid request parameters",
+                    details: error.errors.map((e) => ({
+                        field: e.path.join("."),
+                        message: e.message,
+                    })),
+                },
+            });
+            return;
+        }
         next(error);
     }
 };
@@ -40,30 +56,35 @@ export const updateCreatorHandler = async (
     next: NextFunction,
 ): Promise<void> => {
     try {
-        const {id} = req.params;
-        if (!id) {
-            res.status(400).json({
-                error: {
-                    message: "Creator ID is required",
-                },
-            });
-            return;
-        }
+        const params = creatorIdParamsSchema.parse(req.params);
+        const body = updateCreatorBodySchema.parse(req.body);
 
         const updateCreatorUseCase = new UpdateCreatorUseCase(
             new CreatorRepository()
         );
 
         const updates = {
-            ...req.body,
+            ...body,
             updatedAt: Timestamp.now(),
         };
 
-        await updateCreatorUseCase.execute(id, updates);
+        await updateCreatorUseCase.execute(params.id, updates);
         res.json({
             message: "Creator updated successfully",
         });
     } catch (error) {
+        if (error instanceof ZodError) {
+            res.status(400).json({
+                error: {
+                    message: "Invalid request parameters",
+                    details: error.errors.map((e) => ({
+                        field: e.path.join("."),
+                        message: e.message,
+                    })),
+                },
+            });
+            return;
+        }
         next(error);
     }
 };
@@ -74,23 +95,23 @@ export const deleteCreatorHandler = async (
     next: NextFunction,
 ): Promise<void> => {
     try {
-        const {id} = req.params;
-        if (!id) {
-            res.status(400).json({
-                error: {
-                    message: "Creator ID is required",
-                },
-            });
-            return;
-        }
+        const params = creatorIdParamsSchema.parse(req.params);
 
         const deleteCreatorUseCase = new DeleteCreatorUseCase(
             new CreatorRepository()
         );
 
-        await deleteCreatorUseCase.execute(id);
+        await deleteCreatorUseCase.execute(params.id);
         res.status(204).send();
     } catch (error) {
+        if (error instanceof ZodError) {
+            res.status(400).json({
+                error: {
+                    message: "Invalid creator ID format",
+                },
+            });
+            return;
+        }
         next(error);
     }
 };
