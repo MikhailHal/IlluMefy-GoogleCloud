@@ -11,14 +11,13 @@ export class TagRepository {
      * idを用いたタグ検索
      *
      * @param {string} id 検索対象のタグid
-     * @return {Tag} タグ情報
-     * @throws {Error} タグが見つからない場合
+     * @return {Tag | null} タグ情報（存在しない場合はnull）
      */
-    public async getTagById(id: string): Promise<Tag> {
+    public async getTagById(id: string): Promise<Tag | null> {
         const doc = await this.collection.doc(id).get();
 
         if (!doc.exists) {
-            throw new Error(`Tag with id ${id} not found`);
+            return null;
         }
 
         return {
@@ -92,5 +91,28 @@ export class TagRepository {
      */
     public async deleteTag(id: string): Promise<void> {
         await this.collection.doc(id).delete();
+    }
+
+    /**
+     * タグ名での検索
+     *
+     * @param {string} name 検索対象のタグ名
+     * @return {Tag | null} タグ情報（存在しない場合はnull）
+     */
+    public async getTagByName(name: string): Promise<Tag | null> {
+        const snapshot = await this.collection
+            .where("name", "==", name)
+            .limit(1)
+            .get();
+
+        if (snapshot.empty) {
+            return null;
+        }
+
+        const doc = snapshot.docs[0];
+        return {
+            id: doc.id,
+            ...doc.data(),
+        } as Tag;
     }
 }
