@@ -5,6 +5,7 @@ import {GetCreatorByIdUseCase} from "../../domain/usecase/GetCreatorById/GetCrea
 import {CreatorRepository} from "../../repository/CreatorRepository/CreatorRepository";
 import {creatorIdSchema} from "../../domain/schema/creator.schema";
 import {ZodError} from "zod";
+import {tagSearchQuerySchema} from "../../domain/schema/searchQuery.schema";
 
 export const popularCreatorHandler = async (
     req: Request,
@@ -34,32 +35,32 @@ export const searchCreatorsHandler = async (
     next: NextFunction,
 ): Promise<void> => {
     try {
-        const query = req.query.q as string;
-        if (!query) {
-            res.status(400).json({
-                error: {
-                    message: "Query parameter 'q' is required. Please provide comma-separated tag IDs (e.g., ?q=tag1,tag2,tag3)",
-                },
-            });
-            return;
-        }
-
+        const defaultLimitNum = 20;
+        const query = tagSearchQuerySchema.parse(req.query);
         const searchCreatorsUseCase = new SearchCreatorsUseCase(
             new CreatorRepository()
         );
 
         // 複数タグのAND検索（Firestore制限によりハイブリッド方式）
-        const tagIds = query.split(",").map((tag) => tag.trim()).filter((tag) => tag);
-        const defaultLimitNum = 20;
+        const tagIds = query.q.split(",").map((tag) => tag.trim()).filter((tag) => tag);
         const limit = parseInt(req.query.limit as string) || defaultLimitNum;
-
         const creators = await searchCreatorsUseCase.execute(tagIds, limit);
         res.json({
             data: creators,
         });
     } catch (error) {
-        console.error("Search creators handler error:", error);
-        if (error instanceof Error) {
+        if (error instanceof ZodError) {
+            res.status(400).json({
+                error: {
+                    message: "Invalid request parameters",
+                    details: error.errors.map((e) => ({
+                        field: e.path.join("."),
+                        message: e.message,
+                    })),
+                },
+            });
+            return;
+        } else if (error instanceof Error) {
             res.status(500).json({
                 error: {
                     message: "Internal server error",
