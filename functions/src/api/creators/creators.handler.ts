@@ -6,6 +6,7 @@ import {CreatorRepository} from "../../repository/CreatorRepository/CreatorRepos
 import {creatorIdSchema} from "../../domain/schema/creator.schema";
 import {ZodError} from "zod";
 import {tagSearchQuerySchema} from "../../domain/schema/searchQuery.schema";
+import {fetchNumSchema} from "../../domain/schema/common/fetchNum.schema";
 
 export const popularCreatorHandler = async (
     req: Request,
@@ -14,7 +15,9 @@ export const popularCreatorHandler = async (
 ): Promise<void> => {
     try {
         const defaultLimitNum = 20;
-        const limit = parseInt(req.query.limit as string) || defaultLimitNum;
+        const limit = req.query.limit ?
+            fetchNumSchema.parse(parseInt(req.query.limit as string)) :
+            defaultLimitNum;
 
         const getPopularCreatorsUseCase = new GetPopularCreatorsUseCase(
             new CreatorRepository()
@@ -25,6 +28,14 @@ export const popularCreatorHandler = async (
             data: creators,
         });
     } catch (error) {
+        if (error instanceof ZodError) {
+            res.status(400).json({
+                error: {
+                    message: "Invalid limit parameter. Must be a number greater than 0",
+                },
+            });
+            return;
+        }
         next(error);
     }
 };
@@ -43,7 +54,7 @@ export const searchCreatorsHandler = async (
 
         // 複数タグのAND検索（Firestore制限によりハイブリッド方式）
         const tagIds = query.q.split(",").map((tag) => tag.trim()).filter((tag) => tag);
-        const limit = parseInt(req.query.limit as string) || defaultLimitNum;
+        const limit = query.limit || defaultLimitNum;
         const creators = await searchCreatorsUseCase.execute(tagIds, limit);
         res.json({
             data: creators,
