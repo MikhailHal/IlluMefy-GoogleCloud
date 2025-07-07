@@ -1,6 +1,6 @@
-import {Creator} from "../../models/creator";
-import {UserRepository} from "../../repository/UserRepository/UserRepository";
-import {CreatorRepository} from "../../repository/CreatorRepository/CreatorRepository";
+import {Creator} from "../../../models/creator";
+import {UserRepository} from "../../../repository/UserRepository/UserRepository";
+import {CreatorRepository} from "../../../repository/CreatorRepository/CreatorRepository";
 
 /**
  * ユーザーのお気に入りクリエイター取得ユースケース

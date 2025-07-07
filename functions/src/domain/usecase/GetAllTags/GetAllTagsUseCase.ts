@@ -1,5 +1,5 @@
-import {Tag} from "../../models/tag";
-import {TagRepository} from "../../repository/TagRepository/TagRepository";
+import {Tag} from "../../../models/tag";
+import {TagRepository} from "../../../repository/TagRepository/TagRepository";
 
 /**
  * 全タグ取得ユースケース

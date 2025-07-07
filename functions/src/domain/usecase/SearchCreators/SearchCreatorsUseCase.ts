@@ -1,5 +1,5 @@
-import {Creator} from "../../models/creator";
-import {CreatorRepository} from "../../repository/CreatorRepository/CreatorRepository";
+import {Creator} from "../../../models/creator";
+import {CreatorRepository} from "../../../repository/CreatorRepository/CreatorRepository";
 
 /**
  * クリエイター検索ユースケース

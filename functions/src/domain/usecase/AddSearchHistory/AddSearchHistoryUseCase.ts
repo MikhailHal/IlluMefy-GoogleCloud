@@ -1,4 +1,4 @@
-import {UserRepository} from "../../repository/UserRepository/UserRepository";
+import {UserRepository} from "../../../repository/UserRepository/UserRepository";
 
 /**
  * 検索履歴追加ユースケース

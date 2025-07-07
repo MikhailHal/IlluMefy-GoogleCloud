@@ -1,6 +1,6 @@
-import {Creator} from "../../models/creator";
-import {CreatorRepository} from "../../repository/CreatorRepository/CreatorRepository";
-import {ValidationError} from "../../base/error/ValidationError";
+import {Creator} from "../../../models/creator";
+import {CreatorRepository} from "../../../repository/CreatorRepository/CreatorRepository";
+import {ValidationError} from "../../../base/error/ValidationError";
 
 /**
  * 人気クリエイター取得ユースケース
