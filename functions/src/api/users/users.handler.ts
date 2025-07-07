@@ -8,6 +8,8 @@ import {AddSearchHistoryUseCase} from "../../domain/usecase/AddSearchHistory/Add
 import {AddViewHistoryUseCase} from "../../domain/usecase/AddViewHistory/AddViewHistoryUseCase";
 import {UserRepository} from "../../repository/UserRepository/UserRepository";
 import {CreatorRepository} from "../../repository/CreatorRepository/CreatorRepository";
+import {addSearchHistoryBodySchema, creatorIdParamsSchema} from "../../domain/schema/user.schema";
+import {ZodError} from "zod";
 
 export const getUserFavoritesHandler = async (
     req: AuthRequest,
@@ -53,26 +55,26 @@ export const addFavoriteHandler = async (
             return;
         }
 
-        const {creatorId} = req.params;
-        if (!creatorId) {
-            res.status(400).json({
-                error: {
-                    message: "Creator ID is required",
-                },
-            });
-            return;
-        }
+        const params = creatorIdParamsSchema.parse(req.params);
 
         const addFavoriteCreatorUseCase = new AddFavoriteCreatorUseCase(
             new UserRepository(),
             new CreatorRepository()
         );
 
-        await addFavoriteCreatorUseCase.execute(req.user.uid, creatorId);
+        await addFavoriteCreatorUseCase.execute(req.user.uid, params.creatorId);
         res.status(200).json({
             message: "Favorite added successfully",
         });
     } catch (error) {
+        if (error instanceof ZodError) {
+            res.status(400).json({
+                error: {
+                    message: "Invalid creator ID format",
+                },
+            });
+            return;
+        }
         next(error);
     }
 };
@@ -92,23 +94,23 @@ export const removeFavoriteHandler = async (
             return;
         }
 
-        const {creatorId} = req.params;
-        if (!creatorId) {
-            res.status(400).json({
-                error: {
-                    message: "Creator ID is required",
-                },
-            });
-            return;
-        }
+        const params = creatorIdParamsSchema.parse(req.params);
 
         const userRepository = new UserRepository();
-        await userRepository.removeFavoriteCreator(req.user.uid, creatorId);
+        await userRepository.removeFavoriteCreator(req.user.uid, params.creatorId);
 
         res.status(200).json({
             message: "Favorite removed successfully",
         });
     } catch (error) {
+        if (error instanceof ZodError) {
+            res.status(400).json({
+                error: {
+                    message: "Invalid creator ID format",
+                },
+            });
+            return;
+        }
         next(error);
     }
 };
@@ -128,25 +130,29 @@ export const addSearchHistoryHandler = async (
             return;
         }
 
-        const {tagIds} = req.body;
-        if (!tagIds || !Array.isArray(tagIds) || tagIds.length === 0) {
-            res.status(400).json({
-                error: {
-                    message: "Tag IDs array is required",
-                },
-            });
-            return;
-        }
+        const body = addSearchHistoryBodySchema.parse(req.body);
 
         const addSearchHistoryUseCase = new AddSearchHistoryUseCase(
             new UserRepository()
         );
 
-        await addSearchHistoryUseCase.execute(req.user.uid, tagIds);
+        await addSearchHistoryUseCase.execute(req.user.uid, body.tagIds);
         res.json({
             message: "Search history recorded successfully",
         });
     } catch (error) {
+        if (error instanceof ZodError) {
+            res.status(400).json({
+                error: {
+                    message: "Invalid request parameters",
+                    details: error.errors.map((e) => ({
+                        field: e.path.join("."),
+                        message: e.message,
+                    })),
+                },
+            });
+            return;
+        }
         next(error);
     }
 };
@@ -166,25 +172,25 @@ export const addViewHistoryHandler = async (
             return;
         }
 
-        const {creatorId} = req.params;
-        if (!creatorId) {
-            res.status(400).json({
-                error: {
-                    message: "Creator ID is required",
-                },
-            });
-            return;
-        }
+        const params = creatorIdParamsSchema.parse(req.params);
 
         const addViewHistoryUseCase = new AddViewHistoryUseCase(
             new UserRepository()
         );
 
-        await addViewHistoryUseCase.execute(req.user.uid, creatorId);
+        await addViewHistoryUseCase.execute(req.user.uid, params.creatorId);
         res.json({
             message: "View history recorded successfully",
         });
     } catch (error) {
+        if (error instanceof ZodError) {
+            res.status(400).json({
+                error: {
+                    message: "Invalid creator ID format",
+                },
+            });
+            return;
+        }
         next(error);
     }
 };
