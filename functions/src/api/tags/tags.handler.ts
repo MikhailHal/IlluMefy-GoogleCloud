@@ -1,6 +1,6 @@
 import {Request, Response, NextFunction} from "express";
-import {GetAllTagsUseCase} from "../../usecase/GetAllTags/GetAllTagsUseCase";
-import {GetPopularTagsUseCase} from "../../usecase/GetPopularTags/GetPopularTagsUseCase";
+import {GetAllTagsUseCase} from "../../domain/usecase/GetAllTags/GetAllTagsUseCase";
+import {GetPopularTagsUseCase} from "../../domain/usecase/GetPopularTags/GetPopularTagsUseCase";
 import {TagRepository} from "../../repository/TagRepository/TagRepository";
 
 export const getAllTagsHandler = async (

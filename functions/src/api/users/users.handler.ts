@@ -1,11 +1,11 @@
 import {Response, NextFunction} from "express";
 import {AuthRequest} from "../../middleware/auth";
-import {GetUserFavoritesUseCase} from "../../usecase/GetUserFavorites/GetUserFavoritesUseCase";
+import {GetUserFavoritesUseCase} from "../../domain/usecase/GetUserFavorites/GetUserFavoritesUseCase";
 import {
     AddFavoriteCreatorUseCase,
-} from "../../usecase/AddFavoriteCreator/AddFavoriteCreatorUseCase";
-import {AddSearchHistoryUseCase} from "../../usecase/AddSearchHistory/AddSearchHistoryUseCase";
-import {AddViewHistoryUseCase} from "../../usecase/AddViewHistory/AddViewHistoryUseCase";
+} from "../../domain/usecase/AddFavoriteCreator/AddFavoriteCreatorUseCase";
+import {AddSearchHistoryUseCase} from "../../domain/usecase/AddSearchHistory/AddSearchHistoryUseCase";
+import {AddViewHistoryUseCase} from "../../domain/usecase/AddViewHistory/AddViewHistoryUseCase";
 import {UserRepository} from "../../repository/UserRepository/UserRepository";
 import {CreatorRepository} from "../../repository/CreatorRepository/CreatorRepository";
 

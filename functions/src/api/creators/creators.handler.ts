@@ -1,8 +1,10 @@
 import {Request, Response, NextFunction} from "express";
-import {GetPopularCreatorsUseCase} from "../../usecase/GetPopularCreator/GetPopularCreatorsUseCase";
-import {SearchCreatorsUseCase} from "../../usecase/SearchCreators/SearchCreatorsUseCase";
-import {GetCreatorByIdUseCase} from "../../usecase/GetCreatorById/GetCreatorByIdUseCase";
+import {GetPopularCreatorsUseCase} from "../../domain/usecase/GetPopularCreator/GetPopularCreatorsUseCase";
+import {SearchCreatorsUseCase} from "../../domain/usecase/SearchCreators/SearchCreatorsUseCase";
+import {GetCreatorByIdUseCase} from "../../domain/usecase/GetCreatorById/GetCreatorByIdUseCase";
 import {CreatorRepository} from "../../repository/CreatorRepository/CreatorRepository";
+import {creatorIdSchema} from "../../domain/schema/creator.schema";
+import {ZodError} from "zod";
 
 export const popularCreatorHandler = async (
     req: Request,
@@ -78,14 +80,7 @@ export const getCreatorByIdHandler = async (
 ): Promise<void> => {
     try {
         const {id} = req.params;
-        if (!id) {
-            res.status(400).json({
-                error: {
-                    message: "Creator ID is required",
-                },
-            });
-            return;
-        }
+        creatorIdSchema.parse(id);
 
         const getCreatorByIdUseCase = new GetCreatorByIdUseCase(
             new CreatorRepository()
@@ -96,6 +91,14 @@ export const getCreatorByIdHandler = async (
             data: creator,
         });
     } catch (error) {
+        if (error instanceof ZodError) {
+            res.status(400).json({
+                error: {
+                    message: "Invalid creator ID format",
+                },
+            });
+            return;
+        }
         next(error);
     }
 };

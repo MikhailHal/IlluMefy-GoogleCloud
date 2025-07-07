@@ -1,8 +1,8 @@
 import {Response, NextFunction} from "express";
 import {AuthRequest} from "../../middleware/auth";
-import {CreateCreatorUseCase} from "../../usecase/CreateCreator/CreateCreatorUseCase";
-import {UpdateCreatorUseCase} from "../../usecase/UpdateCreator/UpdateCreatorUseCase";
-import {DeleteCreatorUseCase} from "../../usecase/DeleteCreator/DeleteCreatorUseCase";
+import {CreateCreatorUseCase} from "../../domain/usecase/CreateCreator/CreateCreatorUseCase";
+import {UpdateCreatorUseCase} from "../../domain/usecase/UpdateCreator/UpdateCreatorUseCase";
+import {DeleteCreatorUseCase} from "../../domain/usecase/DeleteCreator/DeleteCreatorUseCase";
 import {CreatorRepository} from "../../repository/CreatorRepository/CreatorRepository";
 import {Timestamp} from "../../config/firebase/firebase";
 
