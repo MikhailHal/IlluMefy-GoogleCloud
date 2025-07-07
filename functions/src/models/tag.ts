@@ -9,6 +9,8 @@ export interface Tag {
     id: string;
     /** タグ名 */
     name: string;
+    /** タグ説明 */
+    description: string;
     /** 閲覧回数 */
     viewCount: number;
     /** 作成日時 */
