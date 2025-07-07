@@ -2,7 +2,7 @@
 ## 🛠️ Development Setup
 
 ### Prerequisites
-- Node.js 18.0 or later
+- Node.js 22.0 or later
 - npm 9.0 or later
 - Firebase CLI
 - Google Cloud SDK (optional for advanced features)
@@ -51,10 +51,10 @@ The backend handles authentication, content filtering, and data management for b
 
 * RESTful API Design: Clean and intuitive endpoints for all client needs
 * Real-time Updates: Firestore integration for instant data synchronization
-* Content Moderation: Perspective API integration for safe community tagging
 * Scalable Architecture: Serverless functions that auto-scale with demand
 * Type Safety: Full TypeScript implementation with Zod validation
 * Security First: Firebase Authentication and proper authorization checks
+* Clean Architecture: Layered architecture with use cases and repositories
 
 ## 🚀 Our Vision
 The backend serves as the foundation for IlluMefy's community-driven discovery system, processing millions of tags and recommendations to help users find their perfect content creators.
@@ -65,50 +65,47 @@ MVP features are being implemented for the upcoming beta release.
 
 ## What are used in this backend?
 ### Basic Information
-Runtime: Node.js 18+  
-Language: TypeScript 5  
+Runtime: Node.js 22  
+Language: TypeScript 4.9  
 Framework: 
-* Express.js
-* CORS
+* Express.js 5.1
+* CORS 2.8
 Database: Firestore (NoSQL)  
-Infrastructure: Firebase Functions → Cloud Run (for scaling)  
+Infrastructure: Firebase Functions  
 Package Manager: npm  
-Testing: Jest  
-Linting: ESLint + Prettier  
-CI/CD: GitHub Actions
+Linting: ESLint
 
 ### Services & APIs
 * Firebase Admin SDK
 * Firebase Authentication
+* Firebase Functions
 * Firestore Database
-* Firebase Storage
-* Perspective API (Content Filtering)
 
 ### Libraries
 #### Web Framework
-* Express.js
-* Cors
-* Helmet (Security)
+* Express.js - Fast, unopinionated web framework
+* CORS - Cross-Origin Resource Sharing middleware
 
 #### Validation & Types
-* TypeScript
-* Zod (Schema Validation)
+* TypeScript - Type-safe JavaScript development
+* Zod - Runtime type validation and schema definition
 
-#### Logging & Monitoring
-* Winston (Logging)
-* Firebase Performance Monitoring
+#### Environment & Configuration
+* dotenv - Environment variable management
+* firebase-functions - Firebase Functions SDK
 
-#### Testing
-* Jest
-* Supertest
-* Firebase Emulators
+#### Development Tools
+* ESLint - Code quality and consistency
+* @typescript-eslint - TypeScript linting rules
+* Firebase Emulators - Local development environment
 
 ### Architecture
-The backend follows a layered architecture pattern:
-- **API Layer**: RESTful endpoints
-- **Service Layer**: Business logic
-- **Repository Layer**: Data access
-- **Model Layer**: Data structures and validation
+The backend follows Clean Architecture pattern:
+- **API Layer**: RESTful endpoints with Express.js
+- **Use Case Layer**: Business logic and orchestration
+- **Repository Layer**: Data access abstraction
+- **Domain Layer**: Entities, schemas, and validation
+- **Infrastructure Layer**: Firebase and external services
 
 ## 📚 API Documentation
 
@@ -121,21 +118,25 @@ Authorization: Bearer {idToken}
 ### Main Endpoints
 
 #### Creators
-- `GET /api/creators` - List creators with pagination
-- `GET /api/creators/:id` - Get creator details
 - `GET /api/creators/popular` - Get popular creators
-- `GET /api/creators/recommended` - Get recommended creators
-- `POST /api/creators/search` - Search creators by tags
+- `GET /api/creators/search?q=tag1,tag2` - Search creators by tags
+- `GET /api/creators/:id` - Get creator details
 
-#### Favorites
-- `GET /api/favorites` - Get user's favorites
-- `POST /api/favorites/:creatorId` - Add to favorites
-- `DELETE /api/favorites/:creatorId` - Remove from favorites
+#### Users
+- `GET /api/users/favorites` - Get user's favorites
+- `POST /api/users/favorites/:creatorId` - Add to favorites
+- `DELETE /api/users/favorites/:creatorId` - Remove from favorites
+- `POST /api/users/search-history` - Record search history
+- `POST /api/users/view-history/:creatorId` - Record view history
 
 #### Tags
 - `GET /api/tags` - Get all tags
-- `GET /api/tags/popular` - Get trending tags
-- `POST /api/tags/apply` - Apply for new tag
+- `GET /api/tags/popular` - Get popular tags
+
+#### Admin
+- `POST /api/admin/creators` - Create new creator
+- `PUT /api/admin/creators/:id` - Update creator
+- `DELETE /api/admin/creators/:id` - Delete creator
 
 ## 🤝 Contributing
 
