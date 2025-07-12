@@ -11,7 +11,7 @@
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/YourUsername/IlluMefy-GoogleCloud.git
+   git clone https://github.com/MikhailHal/IlluMefy-GoogleCloud.git
    cd IlluMefy-GoogleCloud
    ```
 
@@ -49,12 +49,15 @@ The backend handles authentication, content filtering, and data management for b
 
 ## 🌟 Key Features
 
-* RESTful API Design: Clean and intuitive endpoints for all client needs
-* Real-time Updates: Firestore integration for instant data synchronization
-* Scalable Architecture: Serverless functions that auto-scale with demand
-* Type Safety: Full TypeScript implementation with Zod validation
-* Security First: Firebase Authentication and proper authorization checks
-* Clean Architecture: Layered architecture with use cases and repositories
+* **RESTful API Design**: Clean and intuitive endpoints for all client needs
+* **Real-time Updates**: Firestore integration for instant data synchronization
+* **Scalable Architecture**: Serverless functions that auto-scale with demand
+* **Type Safety**: Full TypeScript implementation with Zod validation
+* **Security First**: Firebase Authentication and proper authorization checks
+* **Clean Architecture**: Layered architecture with use cases and repositories
+* **Smart Tag Management**: Vector search-powered duplicate detection and auto-correction
+* **Edit History Tracking**: Complete audit trail for all content modifications
+* **Community-Driven**: User-editable tags with moderation and quality control
 
 ## 🚀 Our Vision
 The backend serves as the foundation for IlluMefy's community-driven discovery system, processing millions of tags and recommendations to help users find their perfect content creators.
@@ -80,6 +83,8 @@ Linting: ESLint
 * Firebase Authentication
 * Firebase Functions
 * Firestore Database
+* Firestore Vector Search
+* OpenAI Embeddings API
 
 ### Libraries
 #### Web Framework
@@ -132,6 +137,13 @@ Authorization: Bearer {idToken}
 #### Tags
 - `GET /api/tags` - Get all tags
 - `GET /api/tags/popular` - Get popular tags
+- `POST /api/tags` - Create new tag (with smart duplicate detection)
+- `PUT /api/tags/:id` - Update tag
+- `DELETE /api/tags/:id` - Delete tag
+
+#### Edit History
+- `GET /api/creators/:id/edit-history` - Get creator edit history
+- `GET /api/users/edit-history` - Get user's edit history
 
 #### Admin
 - `POST /api/admin/creators` - Create new creator
