@@ -6,10 +6,12 @@ import {AppError, AppDetailCode} from "./AppError";
 export class InternalServerError extends AppError {
     /**
      * コンストラクタ
+     *
+     * @param {string} message エラーメッセージ
      */
-    constructor() {
+    constructor(message="Missing required environment parameters.") {
         super(
-            "Missing required environment parameters.",
+            message,
             501,
             AppDetailCode.InternalError
         );
