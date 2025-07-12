@@ -1,9 +1,8 @@
 import OpenAI from "openai";
 import {InternalServerError} from "../../base/error/InternalServerError";
 
-const openai = new OpenAI({
-    apiKey: "",
-});
+// キーは初回使用時にセット
+let openai = new OpenAI({apiKey: ""});
 
 /**
  * ベクトル生成
@@ -21,4 +20,13 @@ export async function createEmbedding(rawValue: string): Promise<number[]> {
     } catch (error) {
         throw new InternalServerError();
     }
+}
+
+/**
+ * OpenAIインスタンスの初期化
+ *
+ * @param {string} key APIキー情報
+ */
+export function initializeOpenAi(key: string) {
+    openai = new OpenAI({apiKey: key});
 }
