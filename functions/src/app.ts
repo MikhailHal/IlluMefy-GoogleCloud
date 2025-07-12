@@ -7,8 +7,22 @@ import creatorsRouter from "./api/creators/creators.router";
 import tagsRouter from "./api/tags/tags.router";
 import usersRouter from "./api/users/users.router";
 import {AppDetailCode, AppError} from "./base/error/AppError";
+import {getSecret} from "./config/secretManager/secretManager";
+import {initializeOpenAi} from "./config/openai/openai";
 
 const app = express();
+
+// OpenAI初期化（Function起動時に1回実行）
+(async () => {
+    try {
+        const openaiApiKey = await getSecret("openai-api-key");
+        initializeOpenAi(openaiApiKey);
+        console.log("OpenAI initialized successfully");
+    } catch (error) {
+        console.error("Failed to initialize OpenAI:", error);
+        process.exit(1); // 初期化失敗時はFunction終了
+    }
+})();
 
 // CORS設定
 app.use(cors({
