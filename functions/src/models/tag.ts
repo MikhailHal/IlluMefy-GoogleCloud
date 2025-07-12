@@ -1,4 +1,5 @@
 import type {Timestamp} from "firebase-admin/firestore";
+import type {FieldValue} from "@google-cloud/firestore";
 
 /**
  * タグ情報のモデル定義
@@ -17,7 +18,7 @@ export interface Tag {
     /** 更新日時 */
     updatedAt: Timestamp;
     /** ベクトル */
-    embed: number[];
+    vector: ReturnType<typeof FieldValue.vector>;
 }
 
 /** Firestoreに保存する際の型（idを除外） */

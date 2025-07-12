@@ -1,5 +1,6 @@
 import {db} from "../../lib/firebase/firebase";
 import {Tag, TagDocument} from "../../models/tag";
+import {FieldValue} from "@google-cloud/firestore";
 
 /**
  * タグデータの基本操作に関するクラス
@@ -144,5 +145,34 @@ export class TagRepository {
             id: doc.id,
             ...doc.data(),
         } as Tag;
+    }
+
+    /**
+     * 類似タグを取得する
+     *
+     * @param {number[]} queryVector クエリベクター
+     * @return {Tag} 類似タグ
+     */
+    public async getNearestTagByVector(queryVector: number[]): Promise<[Tag, number] | null> {
+        const snapshot = await this.collection
+            .findNearest({
+                vectorField: "vector",
+                queryVector: FieldValue.vector(queryVector),
+                limit: 1,
+                distanceMeasure: "COSINE",
+                distanceResultField: "vector_distance",
+            }).get();
+
+        if (snapshot.empty) {
+            return null;
+        }
+        const doc = snapshot.docs[0];
+        const tagInfo = {
+            id: doc.id,
+            ...doc.data(),
+        } as Tag;
+        const distance = doc.get("vector_distance");
+
+        return [tagInfo, distance];
     }
 }
