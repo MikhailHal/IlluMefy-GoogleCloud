@@ -37,8 +37,8 @@ export class UpdateCreatorUseCase {
         }
 
         // クリエイターの存在確認
-        const creator = await this.creatorRepository.getCreatorById(id);
-        if (!creator) {
+        const exists = await this.creatorRepository.creatorExists(id);
+        if (!exists) {
             throw new NotFoundCreatorError();
         }
 

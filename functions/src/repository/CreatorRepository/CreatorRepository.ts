@@ -1,5 +1,6 @@
 import {Creator, CreatorDocument} from "../../models/creator";
 import {db} from "../../config/firebase/firebase";
+import {TagRepository} from "../TagRepository/TagRepository";
 import type {Query} from "firebase-admin/firestore";
 
 /**
@@ -7,77 +8,7 @@ import type {Query} from "firebase-admin/firestore";
  */
 export class CreatorRepository {
     private collection = db.collection("creators");
-
-    /**
-     * 人気クリエイターを返却する
-     *
-     * @param {number} fetchCount データ読み込み件数
-     * @return {Creator[]} 人気クリエイター
-     */
-    public async getPopularCreators(fetchCount: number): Promise<Creator[]> {
-        const snapshot = await this.collection
-            .orderBy("favoriteCount", "desc")
-            .limit(fetchCount)
-            .get();
-
-        return snapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-        } as Creator));
-    }
-
-    /**
-     * idを用いたクリエイター検索
-     *
-     * @param {string} id 検索対象のクリエイターid
-     * @return {Creator | null} idに紐づいたクリエイター、見つからない場合はnull
-     */
-    public async getCreatorById(id: string): Promise<Creator | null> {
-        const doc = await this.collection.doc(id).get();
-
-        if (!doc.exists) {
-            return null;
-        }
-
-        return {
-            id: doc.id,
-            ...doc.data(),
-        } as Creator;
-    }
-
-    /**
-     * タグIDを用いたクリエイター検索（AND検索）
-     *
-     * @param {string[]} tagIds 検索対象のタグIDの配列
-     * @param {number} fetchCount データ読み込み件数
-     * @return {Creator[]} 全てのタグに一致するクリエイター
-     */
-    public async searchCreatorsByTags(
-        tagIds: string[],
-        fetchCount: number
-    ): Promise<Creator[]> {
-        // 最初のタグのみでFirestore検索
-        const query: Query = this.collection.where("tags", "array-contains", tagIds[0]);
-
-        const snapshot = await query
-            .orderBy("favoriteCount", "desc")
-            .limit(fetchCount * 3) // 多めに取得してクライアント側でフィルタ
-            .get();
-
-        const allResults = snapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-        } as Creator));
-
-        // 複数タグの場合はクライアント側でANDフィルタ
-        if (tagIds.length === 1) {
-            return allResults;
-        }
-
-        return allResults.filter((creator) =>
-            tagIds.every((tagId) => creator.tags.includes(tagId))
-        ).slice(0, fetchCount);
-    }
+    private tagRepository = new TagRepository();
 
     /**
      * クリエイターの登録
@@ -112,5 +43,115 @@ export class CreatorRepository {
      */
     public async deleteCreator(id: string): Promise<void> {
         await this.collection.doc(id).delete();
+    }
+
+    /**
+     * Creatorにタグ名を付与
+     *
+     * @param {Creator} creator 変換対象のクリエイター（tagNamesは空でもよい）
+     * @return {Creator} タグ名を含むクリエイター情報
+     */
+    private async enrichWithTagNames(creator: Omit<Creator, "tagNames">): Promise<Creator> {
+        const tagNames = await this.tagRepository.getTagNamesByIds(creator.tags);
+        return {
+            ...creator,
+            tagNames,
+        };
+    }
+
+    /**
+     * 複数のCreatorにタグ名を付与
+     *
+     * @param {Omit<Creator, "tagNames">[]} creators 変換対象のクリエイター配列
+     * @return {Creator[]} タグ名を含むクリエイター配列
+     */
+    private async enrichMultipleWithTagNames(creators: Omit<Creator, "tagNames">[]): Promise<Creator[]> {
+        return Promise.all(creators.map((creator) => this.enrichWithTagNames(creator)));
+    }
+
+    /**
+     * 人気クリエイターを返却する
+     *
+     * @param {number} fetchCount データ読み込み件数
+     * @return {Creator[]} 人気クリエイター（タグ名付き）
+     */
+    public async getPopularCreators(fetchCount: number): Promise<Creator[]> {
+        const snapshot = await this.collection
+            .orderBy("favoriteCount", "desc")
+            .limit(fetchCount)
+            .get();
+
+        const creators = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+        } as Omit<Creator, "tagNames">));
+
+        return this.enrichMultipleWithTagNames(creators);
+    }
+
+    /**
+     * クリエイターの存在確認
+     *
+     * @param {string} id 確認対象のクリエイターid
+     * @return {boolean} クリエイターが存在するかどうか
+     */
+    public async creatorExists(id: string): Promise<boolean> {
+        const doc = await this.collection.doc(id).get();
+        return doc.exists;
+    }
+
+    /**
+     * idを用いたクリエイター検索
+     *
+     * @param {string} id 検索対象のクリエイターid
+     * @return {Creator | null} idに紐づいたクリエイター（タグ名付き）、見つからない場合はnull
+     */
+    public async getCreatorById(id: string): Promise<Creator | null> {
+        const doc = await this.collection.doc(id).get();
+
+        if (!doc.exists) {
+            return null;
+        }
+
+        const creator = {
+            id: doc.id,
+            ...doc.data(),
+        } as Omit<Creator, "tagNames">;
+
+        return this.enrichWithTagNames(creator);
+    }
+
+    /**
+     * タグIDを用いたクリエイター検索（AND検索）
+     *
+     * @param {string[]} tagIds 検索対象のタグIDの配列
+     * @param {number} fetchCount データ読み込み件数
+     * @return {Creator[]} 全てのタグに一致するクリエイター（タグ名付き）
+     */
+    public async searchCreatorsByTags(
+        tagIds: string[],
+        fetchCount: number
+    ): Promise<Creator[]> {
+        // 最初のタグのみでFirestore検索
+        const query: Query = this.collection.where("tags", "array-contains", tagIds[0]);
+
+        const snapshot = await query
+            .orderBy("favoriteCount", "desc")
+            .limit(fetchCount * 3) // 多めに取得してクライアント側でフィルタ
+            .get();
+
+        const allResults = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+        } as Omit<Creator, "tagNames">));
+
+        // 複数タグの場合はクライアント側でANDフィルタ
+        const filteredCreators = tagIds.length === 1 ?
+            allResults :
+            allResults.filter((creator) =>
+                tagIds.every((tagId) => creator.tags.includes(tagId))
+            ).slice(0, fetchCount);
+
+        return this.enrichMultipleWithTagNames(filteredCreators);
     }
 }

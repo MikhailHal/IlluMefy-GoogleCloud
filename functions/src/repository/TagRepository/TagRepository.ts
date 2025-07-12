@@ -94,6 +94,36 @@ export class TagRepository {
     }
 
     /**
+     * 複数のタグIDからタグ名を取得
+     *
+     * @param {string[]} tagIds 取得対象のタグIDの配列
+     * @return {string[]} タグ名の配列（存在しないIDは除外）
+     */
+    public async getTagNamesByIds(tagIds: string[]): Promise<string[]> {
+        if (tagIds.length === 0) {
+            return [];
+        }
+
+        // Firestoreの制限により最大10件ずつ処理
+        const chunkSize = 10;
+        const tagNames: string[] = [];
+
+        for (let i = 0; i < tagIds.length; i += chunkSize) {
+            const chunk = tagIds.slice(i, i + chunkSize);
+            const snapshot = await this.collection
+                .where("__name__", "in", chunk.map((id) => this.collection.doc(id)))
+                .get();
+
+            snapshot.docs.forEach((doc) => {
+                const tagData = doc.data() as TagDocument;
+                tagNames.push(tagData.name);
+            });
+        }
+
+        return tagNames;
+    }
+
+    /**
      * タグ名での検索
      *
      * @param {string} name 検索対象のタグ名

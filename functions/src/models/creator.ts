@@ -48,11 +48,13 @@ export interface Creator {
     };
     /** 直接設定されたタグIDの配列 */
     tags: string[];
+    /** 表示用のタグ名配列 */
+    tagNames: string[];
     /** 作成日時 */
     createdAt: Timestamp;
     /** 更新日時 */
     updatedAt: Timestamp;
 }
 
-/** Firestoreに保存する際の型（idを除外） */
-export type CreatorDocument = Omit<Creator, "id">;
+/** Firestoreに保存する際の型（idとtagNamesを除外） */
+export type CreatorDocument = Omit<Creator, "id" | "tagNames">;
