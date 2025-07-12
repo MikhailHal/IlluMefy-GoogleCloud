@@ -6,9 +6,12 @@ import {
 } from "../../domain/usecase/AddFavoriteCreator/AddFavoriteCreatorUseCase";
 import {AddSearchHistoryUseCase} from "../../domain/usecase/AddSearchHistory/AddSearchHistoryUseCase";
 import {AddViewHistoryUseCase} from "../../domain/usecase/AddViewHistory/AddViewHistoryUseCase";
+import {GetUserEditHistoryUseCase} from "../../domain/usecase/GetUserEditHistory/GetUserEditHistoryUseCase";
 import {UserRepository} from "../../repository/UserRepository/UserRepository";
 import {CreatorRepository} from "../../repository/CreatorRepository/CreatorRepository";
+import {CreatorEditHistoryRepository} from "../../repository/CreatorEditHistoryRepository/CreatorEditHistoryRepository";
 import {addSearchHistoryBodySchema, creatorIdParamsSchema} from "../../domain/schema/user.schema";
+import {editHistoryQuerySchema} from "../../domain/schema/common/fetchNum.schema";
 import {ZodError} from "zod";
 
 export const getUserFavoritesHandler = async (
@@ -187,6 +190,60 @@ export const addViewHistoryHandler = async (
             res.status(400).json({
                 error: {
                     message: "Invalid creator ID format",
+                },
+            });
+            return;
+        }
+        next(error);
+    }
+};
+
+/**
+ * ユーザー別編集履歴取得ハンドラー
+ *
+ * @param {AuthRequest} req リクエスト
+ * @param {Response} res レスポンス
+ * @param {NextFunction} next 次のミドルウェア
+ */
+export const getUserEditHistoryHandler = async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction,
+): Promise<void> => {
+    try {
+        if (!req.user) {
+            res.status(401).json({
+                error: {
+                    message: "Unauthorized",
+                },
+            });
+            return;
+        }
+
+        const query = editHistoryQuerySchema.parse(req.query);
+
+        const getUserEditHistoryUseCase = new GetUserEditHistoryUseCase(
+            new CreatorEditHistoryRepository()
+        );
+
+        const result = await getUserEditHistoryUseCase.execute(
+            req.user.uid,
+            query.limit,
+            query.cursor
+        );
+
+        res.json({
+            data: result,
+        });
+    } catch (error) {
+        if (error instanceof ZodError) {
+            res.status(400).json({
+                error: {
+                    message: "Invalid request parameters",
+                    details: error.errors.map((e) => ({
+                        field: e.path.join("."),
+                        message: e.message,
+                    })),
                 },
             });
             return;

@@ -6,6 +6,7 @@ import {
     removeFavoriteHandler,
     addSearchHistoryHandler,
     addViewHistoryHandler,
+    getUserEditHistoryHandler,
 } from "./users.handler";
 
 // eslint-disable-next-line new-cap
@@ -19,5 +20,6 @@ router.post("/favorites/:creatorId", addFavoriteHandler);
 router.delete("/favorites/:creatorId", removeFavoriteHandler);
 router.post("/search-history", addSearchHistoryHandler);
 router.post("/view-history/:creatorId", addViewHistoryHandler);
+router.get("/edit-history", getUserEditHistoryHandler);
 
 export default router;

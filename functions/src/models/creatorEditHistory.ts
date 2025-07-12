@@ -1,4 +1,5 @@
 import type {Timestamp} from "firebase-admin/firestore";
+import {EditReasonType} from "../domain/enum/editReason";
 
 /**
  * クリエイター編集履歴のモデル定義
@@ -41,7 +42,7 @@ export interface CreatorEditHistory {
 
     /** メタデータ */
     timestamp: Timestamp;
-    editReason?: "user_edit" | "moderation" | "correction_request" | "bulk_update";
+    editReason?: EditReasonType;
     moderatorNote?: string; // モデレーターが編集した場合のメモ
 }
 
