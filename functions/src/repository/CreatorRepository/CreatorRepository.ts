@@ -1,5 +1,5 @@
 import {Creator, CreatorDocument} from "../../models/creator";
-import {db} from "../../config/firebase/firebase";
+import {db} from "../../lib/firebase/firebase";
 import {TagRepository} from "../TagRepository/TagRepository";
 import type {Query} from "firebase-admin/firestore";
 

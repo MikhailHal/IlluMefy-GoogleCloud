@@ -12,7 +12,7 @@ import {TagRepository} from "../../repository/TagRepository/TagRepository";
 import {creatorIdSchema} from "../../domain/schema/creator.schema";
 import {createCreatorBodySchema, updateCreatorBodySchema, creatorIdParamsSchema} from "../../domain/schema/admin.schema";
 import {EditReason} from "../../domain/enum/editReason";
-import {Timestamp} from "../../config/firebase/firebase";
+import {Timestamp} from "../../lib/firebase/firebase";
 import {ZodError} from "zod";
 import {tagSearchQuerySchema} from "../../domain/schema/searchQuery.schema";
 import {fetchNumSchema} from "../../domain/schema/common/fetchNum.schema";

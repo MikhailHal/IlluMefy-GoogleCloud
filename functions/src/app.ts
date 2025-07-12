@@ -7,8 +7,8 @@ import creatorsRouter from "./api/creators/creators.router";
 import tagsRouter from "./api/tags/tags.router";
 import usersRouter from "./api/users/users.router";
 import {AppDetailCode, AppError} from "./base/error/AppError";
-import {getSecret} from "./config/secretManager/secretManager";
-import {initializeOpenAi} from "./config/openai/openai";
+import {getSecret} from "./lib/secretManager/secretManager";
+import {initializeOpenAi} from "./lib/openai/openai";
 
 const app = express();
 

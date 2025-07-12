@@ -2,7 +2,7 @@ import {TagDocument} from "../../../models/tag";
 import {TagRepository} from "../../../repository/TagRepository/TagRepository";
 import {ValidationError} from "../../../base/error/ValidationError";
 import {NotFoundError} from "../../../base/error/NotFoundError";
-import {Timestamp} from "../../../config/firebase/firebase";
+import {Timestamp} from "../../../lib/firebase/firebase";
 
 /**
  * タグ更新ユースケース

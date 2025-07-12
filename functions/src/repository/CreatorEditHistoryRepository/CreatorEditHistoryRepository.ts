@@ -1,5 +1,5 @@
 import {CreatorEditHistory, CreatorEditHistoryDocument} from "../../models/creatorEditHistory";
-import {db} from "../../config/firebase/firebase";
+import {db} from "../../lib/firebase/firebase";
 
 /**
  * クリエイター編集履歴データの基本操作に関するクラス

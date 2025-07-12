@@ -1,5 +1,5 @@
 import {Request, Response, NextFunction} from "express";
-import {auth} from "../config/firebase/firebase";
+import {auth} from "../lib/firebase/firebase";
 import {DecodedIdToken} from "firebase-admin/auth";
 import {UnauthorizedError} from "../base/error/UnauthorizedError";
 

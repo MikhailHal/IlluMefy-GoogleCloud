@@ -1,4 +1,4 @@
-import {db} from "../../config/firebase/firebase";
+import {db} from "../../lib/firebase/firebase";
 import {Tag, TagDocument} from "../../models/tag";
 
 /**

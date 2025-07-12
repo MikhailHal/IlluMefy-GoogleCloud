@@ -1,4 +1,4 @@
-import {db, FieldValue} from "../../config/firebase/firebase";
+import {db, FieldValue} from "../../lib/firebase/firebase";
 import {User, UserDocument} from "../../models/user";
 import type {Timestamp} from "firebase-admin/firestore";
 
