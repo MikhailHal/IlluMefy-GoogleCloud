@@ -3,6 +3,7 @@ import {TagRepository} from "../../../repository/TagRepository/TagRepository";
 import {ValidationError} from "../../../base/error/ValidationError";
 import {Timestamp} from "../../../lib/firebase/firebase";
 import {createEmbedding} from "../../../lib/openai/openai";
+import {FieldValue} from "@google-cloud/firestore";
 
 /**
  * タグ作成ユースケース
@@ -32,7 +33,23 @@ export class CreateTagUseCase {
             throw new ValidationError("Tag name already exists", {name});
         }
 
-        const embed = await createEmbedding(name);
+        const vector = await createEmbedding(name);
+        const nearestTag = await this.tagRepository.getNearestTagByVector(vector);
+        if (nearestTag) {
+            // 0.0が最近傍であり1.0が最遠点となる（COSINEの場合）
+            const distance = nearestTag[1];
+            // 検証結果に基づく閾値設定（OpenAI text-embedding-3-small使用）:
+            // - "apex" ↔ "Apex": 0.123 (大文字小文字の違い)
+            // - "apex" ↔ "apex legends": 0.304 (語句の拡張)
+            // - "apex" ↔ "エーペックス": 0.633 (言語間の表記揺れ)
+            //
+            // 閾値0.75により上記の表記揺れを全て検出し、統合処理を行う
+            // より曖昧な類似は除外され、全く異なるタグ（fortnite等）は別タグとして作成
+            if (distance <= 0.75) {
+                // 近しいものがある場合はそれを指定する。
+                return nearestTag[0].id;
+            }
+        }
 
         const tagDocument: TagDocument = {
             name,
@@ -40,7 +57,7 @@ export class CreateTagUseCase {
             viewCount: 0,
             createdAt: Timestamp.now(),
             updatedAt: Timestamp.now(),
-            embed: embed,
+            vector: FieldValue.vector(vector),
         };
 
         return await this.tagRepository.addTag(tagDocument);
