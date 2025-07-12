@@ -2,6 +2,7 @@ import {TagDocument} from "../../../models/tag";
 import {TagRepository} from "../../../repository/TagRepository/TagRepository";
 import {ValidationError} from "../../../base/error/ValidationError";
 import {Timestamp} from "../../../lib/firebase/firebase";
+import {createEmbedding} from "../../../lib/openai/openai";
 
 /**
  * タグ作成ユースケース
@@ -31,12 +32,15 @@ export class CreateTagUseCase {
             throw new ValidationError("Tag name already exists", {name});
         }
 
+        const embed = await createEmbedding(name);
+
         const tagDocument: TagDocument = {
             name,
             description: description || "",
             viewCount: 0,
             createdAt: Timestamp.now(),
             updatedAt: Timestamp.now(),
+            embed: embed,
         };
 
         return await this.tagRepository.addTag(tagDocument);

@@ -2,7 +2,6 @@ import type {Timestamp} from "firebase-admin/firestore";
 
 /**
  * タグ情報のモデル定義
- * フラット構造でシンプルな検索を実現
  */
 export interface Tag {
     /** Firestore ドキュメントID */
@@ -17,6 +16,8 @@ export interface Tag {
     createdAt: Timestamp;
     /** 更新日時 */
     updatedAt: Timestamp;
+    /** ベクトル */
+    embed: number[];
 }
 
 /** Firestoreに保存する際の型（idを除外） */
