@@ -85,6 +85,7 @@ Linting: ESLint
 * Firestore Database
 * Firestore Vector Search
 * Google Secret Manager
+* YouTube Data API
 * OpenAI Embeddings API
 
 ### Libraries
