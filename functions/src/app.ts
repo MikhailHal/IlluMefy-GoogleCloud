@@ -9,18 +9,20 @@ import usersRouter from "./api/users/users.router";
 import {AppDetailCode, AppError} from "./base/error/AppError";
 import {getSecret} from "./lib/secretManager/secretManager";
 import {initializeOpenAi} from "./lib/openai/openai";
+import {initializeYouTube} from "./lib/youtube/youtube";
 
 const app = express();
 
-// OpenAI初期化（Function起動時に1回実行）
+// API初期化
 (async () => {
     try {
         const openaiApiKey = await getSecret("openai-api-key");
+        const youtubeDataApiKey = await getSecret("youtube-data-api-key");
         initializeOpenAi(openaiApiKey);
-        console.log("OpenAI initialized successfully");
+        initializeYouTube(youtubeDataApiKey);
     } catch (error) {
-        console.error("Failed to initialize OpenAI:", error);
-        process.exit(1); // 初期化失敗時はFunction終了
+        console.error("Failed to initialize api instance:", error);
+        process.exit(1);
     }
 })();
 
