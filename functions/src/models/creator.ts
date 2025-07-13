@@ -24,6 +24,8 @@ export interface Creator {
         channelId: string;
         /** チャンネル登録者数 */
         subscriberCount: number;
+        /** 総視聴回数 */
+        viewCount?: number;
       };
       /** Twitch 情報 */
       twitch?: {

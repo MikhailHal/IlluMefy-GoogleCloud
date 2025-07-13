@@ -4,11 +4,10 @@ import {InternalServerError} from "../../base/error/InternalServerError";
 
 const TAG = "Youtube Data API";
 
-// apiキーは後から初期化
-let youtube = google.youtube({
-    version: "v3",
-    auth: "",
-});
+let apiKey = "";
+
+// YouTube APIインスタンス（初期化後に設定）
+let youtube: any;
 
 /**
  * チャンネル詳細情報の取得
@@ -17,6 +16,18 @@ let youtube = google.youtube({
  */
 export async function getChannelDetail(channelUrl: string): Promise<YouTubeChannel | null> {
     try {
+        console.log(`[${TAG}] - YouTube instance exists:`, !!youtube);
+        console.log(`[${TAG}] - API key length:`, apiKey.length);
+
+        // 初期化されていない場合は、Secret Managerから取得して初期化
+        if (!youtube || !apiKey) {
+            console.log(`[${TAG}] - YouTube not initialized, getting API key from Secret Manager`);
+            const {getSecret} = await import("../secretManager/secretManager.js");
+            const youtubeDataApiKey = await getSecret("youtube-data-api-key");
+            initializeYouTube(youtubeDataApiKey);
+            console.log(`[${TAG}] - YouTube re-initialized with key length:`, youtubeDataApiKey.length);
+        }
+
         const {id, isHandle} = extractChannelId(channelUrl);
         console.log(`[${TAG}] - Extracted id is ${id}`);
         console.log(`[${TAG}] - Fetch channel information!!`);
@@ -27,15 +38,30 @@ export async function getChannelDetail(channelUrl: string): Promise<YouTubeChann
         let res;
         if (isHandle) {
             // @ハンドル形式の場合
-            res = await youtube.channels.list({
-                part: ["snippet", "statistics"],
-                forHandle: id,
-            });
+            console.log(`[${TAG}] - Using forHandle with value: ${id}`);
+            try {
+                res = await youtube.channels.list({
+                    part: ["snippet", "statistics"],
+                    forHandle: id,
+                    key: apiKey,
+                });
+                console.log(`[${TAG}] - forHandle API response:`, JSON.stringify(res.data, null, 2));
+            } catch (handleError) {
+                console.log(`[${TAG}] - forHandle failed, trying forUsername:`, handleError);
+                // forHandleが失敗した場合はforUsernameで試す
+                res = await youtube.channels.list({
+                    part: ["snippet", "statistics"],
+                    forUsername: id,
+                    key: apiKey,
+                });
+                console.log(`[${TAG}] - forUsername API response:`, JSON.stringify(res.data, null, 2));
+            }
         } else {
             // チャンネルID形式の場合
             res = await youtube.channels.list({
                 part: ["snippet", "statistics"],
                 id: [id],
+                key: apiKey,
             });
         }
 
@@ -104,9 +130,19 @@ function extractChannelId(url: string): {id: string | null; isHandle: boolean} {
  * @param {string} key APIキー
  */
 export function initializeYouTube(key: string) {
-    youtube = google.youtube({
-        version: "v3",
-        auth: key,
-    });
+    apiKey = key;
+    console.log(`[${TAG}] - Initializing with API key length: ${key.length}`);
+
+    try {
+        youtube = google.youtube({
+            version: "v3",
+            auth: key,
+        });
+        console.log(`[${TAG}] - YouTube instance created:`, !!youtube);
+        console.log(`[${TAG}] - YouTube.channels exists:`, !!youtube?.channels);
+    } catch (error) {
+        console.log(`[${TAG}] - Failed to create YouTube instance:`, error);
+    }
+
     console.log(`[${TAG}] - Succeed to initialize the instance!`);
 }
