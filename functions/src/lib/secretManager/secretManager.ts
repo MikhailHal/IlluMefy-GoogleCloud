@@ -1,6 +1,7 @@
 import {SecretManagerServiceClient} from "@google-cloud/secret-manager";
 import {InternalServerError} from "../../base/error/InternalServerError";
 
+const TAG = "Secret Manager";
 const client = new SecretManagerServiceClient();
 
 /**
@@ -11,6 +12,7 @@ const client = new SecretManagerServiceClient();
  */
 export async function getSecret(secretName:string): Promise<string> {
     try {
+        console.log(`[${TAG}] - Start to fetch ${secretName} value info`);
         const secretPath = `projects/405184515768/secrets/${secretName}/versions/latest`;
         const [version] = await client.accessSecretVersion({
             name: secretPath,
@@ -19,9 +21,10 @@ export async function getSecret(secretName:string): Promise<string> {
         if (!secretValue) {
             throw new Error("Secret value is empty");
         }
+        console.log(`[${TAG}] - Succeed to fetch ${secretName} value info`);
         return secretValue;
     } catch (error) {
-        console.error("Secret Manager error:", error);
+        console.log(`[${TAG}] - Failed to fetch ${secretName} value info`);
         throw new InternalServerError(`Failed to get secret ${secretName}: ${error}`);
     }
 }
