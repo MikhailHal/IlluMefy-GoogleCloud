@@ -15,6 +15,7 @@
   },
   "main": "lib/index.js",
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.56.0",
     "@google-cloud/secret-manager": "^6.1.0",
     "@modelcontextprotocol/sdk": "^1.15.1",
     "cors": "^2.8.5",
