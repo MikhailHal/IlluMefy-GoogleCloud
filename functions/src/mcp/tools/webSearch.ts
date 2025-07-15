@@ -1,12 +1,24 @@
 import {searchWeb} from "../../lib/search/braveSearch.js";
 
+export interface WebSearchArgs {
+    query: string;
+}
+
+interface WebSearchResult {
+    content: Array<{
+        type: string;
+        text: string;
+    }>;
+    [key: string]: unknown;
+}
+
 /**
  * Web検索
  *
- * @param {any} args 引数
- * @return {Promise<any>} 検索結果
+ * @param {WebSearchArgs} args 引数
+ * @return {Promise<WebSearchResult>} 検索結果
  */
-export async function executeWebSearch(args: any): Promise<any> {
+export async function executeWebSearch(args: WebSearchArgs): Promise<WebSearchResult> {
     const {query} = args;
 
     try {

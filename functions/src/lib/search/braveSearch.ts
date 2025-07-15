@@ -2,6 +2,12 @@ import {InternalServerError} from "../../base/error/InternalServerError";
 
 const TAG = "Brave Search API";
 
+interface BraveSearchResult {
+    title: string;
+    url: string;
+    description: string;
+}
+
 let apiKey = "";
 
 /**
@@ -18,9 +24,9 @@ export function initializeBraveSearch(key: string) {
  * Web検索実行
  *
  * @param {string} query 検索クエリ
- * @return {Promise<any>} 検索結果
+ * @return {Promise<BraveSearchResult[]>} 検索結果
  */
-export async function searchWeb(query: string): Promise<any> {
+export async function searchWeb(query: string): Promise<BraveSearchResult[]> {
     if (!apiKey) {
         throw new InternalServerError(`[${TAG}] - API key not initialized`);
     }

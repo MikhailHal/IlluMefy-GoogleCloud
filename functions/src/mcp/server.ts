@@ -1,7 +1,7 @@
 import {Server} from "@modelcontextprotocol/sdk/server/index.js";
 import {StdioServerTransport} from "@modelcontextprotocol/sdk/server/stdio.js";
 import {JSONRPCRequest, ListToolsRequestSchema, CallToolRequestSchema} from "@modelcontextprotocol/sdk/types.js";
-import {executeWebSearch} from "./tools/webSearch.js";
+import {executeWebSearch, WebSearchArgs} from "./tools/webSearch.js";
 
 /**
  * MCP Server
@@ -50,7 +50,7 @@ export class MCPServer {
             const {name, arguments: args} = request.params;
 
             if (name === "web_search") {
-                return await executeWebSearch(args);
+                return await executeWebSearch(args as unknown as WebSearchArgs);
             }
 
             throw new Error(`Unknown tool: ${name}`);
@@ -93,7 +93,7 @@ export class MCPServer {
             }
 
             if (request.method === "tools/call") {
-                const params = request.params as { name: string; arguments: any };
+                const params = request.params as { name: string; arguments: WebSearchArgs };
                 const {name, arguments: args} = params;
                 if (name === "web_search") {
                     const result = await executeWebSearch(args);

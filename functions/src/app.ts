@@ -12,6 +12,7 @@ import {getSecret} from "./lib/secretManager/secretManager";
 import {initializeOpenAi} from "./lib/openai/openai";
 import {initializeYouTube} from "./lib/youtube/youtube";
 import {initializeBraveSearch} from "./lib/search/braveSearch";
+import {initializeAnthropic} from "./lib/anthropic/anthropic";
 
 const app = express();
 
@@ -21,9 +22,11 @@ const app = express();
         const openaiApiKey = await getSecret("openai-api-key");
         const youtubeDataApiKey = await getSecret("youtube-data-api-key");
         const braveSearchApiKey = await getSecret("brave-search-api-key");
+        const anthropicApiKey = await getSecret("anthropic-api-key");
         initializeOpenAi(openaiApiKey);
         initializeYouTube(youtubeDataApiKey);
         initializeBraveSearch(braveSearchApiKey);
+        initializeAnthropic(anthropicApiKey);
     } catch (error) {
         console.error("Failed to initialize api instance:", error);
         process.exit(1);
