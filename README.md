@@ -56,6 +56,8 @@ The backend handles authentication, content filtering, and data management for b
 * **Security First**: Firebase Authentication and proper authorization checks
 * **Clean Architecture**: Layered architecture with use cases and repositories
 * **Smart Tag Management**: Vector search-powered duplicate detection and auto-correction
+* **AI-Powered Tag Generation**: Automatic tag creation from YouTube channels using Claude AI
+* **Web Search Integration**: Real-time web search for comprehensive creator information
 * **Edit History Tracking**: Complete audit trail for all content modifications
 * **Community-Driven**: User-editable tags with moderation and quality control
 
@@ -87,6 +89,8 @@ Linting: ESLint
 * Google Secret Manager
 * YouTube Data API
 * OpenAI Embeddings API
+* Anthropic Claude API
+* Brave Search API
 
 ### Libraries
 #### Web Framework
@@ -149,6 +153,7 @@ Authorization: Bearer {idToken}
 
 #### Admin
 - `POST /api/admin/creators` - Create new creator
+- `POST /api/admin/creators/youtube` - Create creator from YouTube channel URL (with AI tag generation)
 - `PUT /api/admin/creators/:id` - Update creator
 - `DELETE /api/admin/creators/:id` - Delete creator
 
