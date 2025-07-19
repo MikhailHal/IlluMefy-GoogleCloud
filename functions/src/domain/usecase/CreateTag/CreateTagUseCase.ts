@@ -33,6 +33,23 @@ export class CreateTagUseCase {
             throw new ValidationError("Tag name already exists", {name});
         }
 
+        return await this.createOrGetExisting(name, description);
+    }
+
+    /**
+     * タグ作成または既存タグ取得（YouTubeクリエイター作成用）
+     *
+     * @param {string} name タグ名
+     * @param {string} description タグ説明（オプション）
+     * @return {string} タグのID（既存または新規作成）
+     */
+    public async createOrGetExisting(name: string, description?: string): Promise<string> {
+        // タグ名の完全一致チェック（既存があれば返す）
+        const existingTag = await this.tagRepository.getTagByName(name);
+        if (existingTag) {
+            return existingTag.id;
+        }
+
         const vector = await createEmbedding(name);
         const nearestTag = await this.tagRepository.getNearestTagByVector(vector);
         if (nearestTag) {

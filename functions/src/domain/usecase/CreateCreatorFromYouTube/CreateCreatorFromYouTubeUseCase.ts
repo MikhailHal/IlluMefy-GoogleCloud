@@ -8,10 +8,16 @@ import {Timestamp} from "firebase-admin/firestore";
 import {EditReason} from "../../enum/editReason";
 import {searchWeb} from "../../../lib/search/braveSearch";
 import {execPrompt} from "../../../lib/anthropic/anthropic";
+import {CreateTagUseCase} from "../CreateTag/CreateTagUseCase";
+import {TagRepository} from "../../../repository/TagRepository/TagRepository";
 
 // 検索結果の型定義
 interface SearchResults {
-    [key: string]: any[];
+    [key: string]: Array<{
+        title: string;
+        url: string;
+        description: string;
+    }>;
 }
 
 // 検索結果のメタデータ
@@ -62,8 +68,11 @@ export class CreateCreatorFromYouTubeUseCase {
         // タグを生成（MCPツールを使った自律的な調査）
         const generatedTags = await this.generateTagsFromChannelInfo(youtubeChannel);
 
-        // YouTubeChannelをCreatorDocumentに変換（生成されたタグを含む）
-        const creatorDocument = this.convertYouTubeChannelToCreator(youtubeChannel, generatedTags);
+        // タグマスターに登録（表記揺れチェック付き）
+        const registeredTagIds = await this.registerTagsWithSimilarityCheck(generatedTags, youtubeChannel.name);
+
+        // YouTubeChannelをCreatorDocumentに変換（登録されたタグIDを含む）
+        const creatorDocument = this.convertYouTubeChannelToCreator(youtubeChannel, registeredTagIds);
 
         // 既存のCreateCreatorUseCaseを使用してクリエイターを作成
         const creatorId = await this.createCreatorUseCase.execute(creatorDocument);
@@ -171,10 +180,60 @@ export class CreateCreatorFromYouTubeUseCase {
     }
 
     /**
+     * タグマスターへの登録（表記揺れチェック付き）
+     *
+     * @param {string[]} tagNames タグ名の配列
+     * @param {string} channelName チャンネル名
+     * @return {Promise<string[]>} 登録されたタグIDの配列
+     */
+    private async registerTagsWithSimilarityCheck(tagNames: string[], channelName: string): Promise<string[]> {
+        const BATCH_SIZE = 5; // 同時実行数を制限（OpenAI APIのレート制限を考慮）
+        const registeredTagIds: string[] = [];
+        const createTagUseCase = new CreateTagUseCase(new TagRepository());
+
+        console.log(`[YouTube UseCase] - Starting tag registration for ${tagNames.length} tags`);
+
+        for (let i = 0; i < tagNames.length; i += BATCH_SIZE) {
+            const batch = tagNames.slice(i, i + BATCH_SIZE);
+            console.log(`[YouTube UseCase] - Processing batch ${Math.floor(i / BATCH_SIZE) + 1}/${Math.ceil(tagNames.length / BATCH_SIZE)}`);
+
+            const batchResults = await Promise.all(
+                batch.map(async (tagName) => {
+                    try {
+                        // CreateTagUseCaseのcreateOrGetExistingが以下を自動で処理:
+                        // 1. 完全一致する既存タグがあればそのIDを返す
+                        // 2. ベクトル類似度0.75以下の類似タグがあれば既存タグのIDを返す
+                        // 3. 類似タグがなければ新規作成してIDを返す
+                        const tagId = await createTagUseCase.createOrGetExisting(tagName, `${channelName}関連のタグ`);
+    
+                        console.log(`[YouTube UseCase] - Tag processed: "${tagName}" -> ID: ${tagId}`);
+                        return tagId;
+                    } catch (error) {
+                        console.error(`[YouTube UseCase] - Failed to process tag "${tagName}":`, error);
+                        return null;
+                    }
+                })
+            );
+
+            // null以外のタグIDを追加
+            registeredTagIds.push(...batchResults.filter((id): id is string => id !== null));
+
+            // 最後のバッチ以外は少し待機（APIレート制限対策）
+            if (i + BATCH_SIZE < tagNames.length) {
+                await new Promise((resolve) => setTimeout(resolve, 200));
+            }
+        }
+
+        // 重複するタグIDを除去
+        const uniqueTagIds = [...new Set(registeredTagIds)];
+        return uniqueTagIds;
+    }
+
+    /**
      * YouTubeChannelをCreatorDocumentに変換
      *
      * @param {YouTubeChannel} channel YouTube チャンネル情報
-     * @param {string[]} tags 生成されたタグ
+     * @param {string[]} tags 登録されたタグIDの配列
      * @return {CreatorDocument} Creator ドキュメント
      */
     private convertYouTubeChannelToCreator(channel: YouTubeChannel, tags: string[] = []): CreatorDocument {
