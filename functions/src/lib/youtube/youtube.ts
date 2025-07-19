@@ -7,7 +7,7 @@ const TAG = "Youtube Data API";
 let apiKey = "";
 
 // YouTube APIインスタンス（初期化後に設定）
-let youtube: any;
+let youtube: any = null;
 
 /**
  * チャンネル詳細情報の取得
