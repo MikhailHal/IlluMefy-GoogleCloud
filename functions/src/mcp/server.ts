@@ -65,7 +65,7 @@ export class MCPServer {
      * @param {JSONRPCRequest} request リクエスト
      * @return {any} 処理結果
      */
-    async handleRequest(request: JSONRPCRequest): Promise<any> {
+    async handleRequest(request: JSONRPCRequest): Promise<{jsonrpc: string; id: any; result?: any; error?: {code: number; message: string}}> {
         try {
             if (request.method === "tools/list") {
                 return {

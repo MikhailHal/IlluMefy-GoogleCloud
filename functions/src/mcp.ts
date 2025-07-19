@@ -1,5 +1,7 @@
 import {onRequest} from "firebase-functions/v2/https";
 import {MCPServer} from "./mcp/server";
+import {getSecret} from "./lib/secretManager/secretManager";
+import {initializeBraveSearch} from "./lib/search/braveSearch";
 
 /**
  * MCPサーバーの入り口
@@ -10,6 +12,14 @@ export const mcp = onRequest({
     timeoutSeconds: 300,
 }, async (req, res) => {
     try {
+        // Brave Search APIを初期化
+        try {
+            const braveSearchApiKey = await getSecret("brave-search-api-key");
+            initializeBraveSearch(braveSearchApiKey);
+        } catch (error) {
+            console.error("Failed to initialize Brave Search API:", error);
+        }
+
         const server = new MCPServer();
         await server.initialize();
 
