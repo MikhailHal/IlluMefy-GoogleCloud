@@ -58,6 +58,7 @@ The backend handles authentication, content filtering, and data management for b
 * **Smart Tag Management**: Vector search-powered duplicate detection and auto-correction
 * **AI-Powered Tag Generation**: Automatic tag creation from YouTube channels using Claude AI
 * **Web Search Integration**: Real-time web search for comprehensive creator information
+* **Content Moderation**: Perspective API integration for toxic content detection
 * **Edit History Tracking**: Complete audit trail for all content modifications
 * **Community-Driven**: User-editable tags with moderation and quality control
 
@@ -91,6 +92,7 @@ Linting: ESLint
 * OpenAI Embeddings API
 * Anthropic Claude API
 * Brave Search API
+* Google Perspective API
 
 ### Libraries
 #### Web Framework
