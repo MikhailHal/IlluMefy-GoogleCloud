@@ -7,7 +7,7 @@ const TAG = "Youtube Data API";
 let apiKey = "";
 
 // YouTube APIインスタンス（初期化後に設定）
-let youtube: any = null;
+let youtube: ReturnType<typeof google.youtube> | null = null;
 
 /**
  * チャンネル詳細情報の取得
@@ -40,7 +40,7 @@ export async function getChannelDetail(channelUrl: string): Promise<YouTubeChann
             // @ハンドル形式の場合
             console.log(`[${TAG}] - Using forHandle with value: ${id}`);
             try {
-                res = await youtube.channels.list({
+                res = await youtube!.channels.list({
                     part: ["snippet", "statistics"],
                     forHandle: id,
                     key: apiKey,
@@ -49,7 +49,7 @@ export async function getChannelDetail(channelUrl: string): Promise<YouTubeChann
             } catch (handleError) {
                 console.log(`[${TAG}] - forHandle failed, trying forUsername:`, handleError);
                 // forHandleが失敗した場合はforUsernameで試す
-                res = await youtube.channels.list({
+                res = await youtube!.channels.list({
                     part: ["snippet", "statistics"],
                     forUsername: id,
                     key: apiKey,
@@ -58,7 +58,7 @@ export async function getChannelDetail(channelUrl: string): Promise<YouTubeChann
             }
         } else {
             // チャンネルID形式の場合
-            res = await youtube.channels.list({
+            res = await youtube!.channels.list({
                 part: ["snippet", "statistics"],
                 id: [id],
                 key: apiKey,
