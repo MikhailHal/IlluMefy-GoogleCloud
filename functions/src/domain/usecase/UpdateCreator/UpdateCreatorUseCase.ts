@@ -7,6 +7,7 @@ import {ValidationError} from "../../../base/error/ValidationError";
 import {NotFoundCreatorError} from "../../../base/error/NotFoundCreatorError";
 import {FieldValue, Timestamp} from "firebase-admin/firestore";
 import {EditReason, EditReasonType} from "../../enum/editReason";
+import {isToxic} from "../../../lib/perspective/perspective";
 
 /**
  * クリエイター更新ユースケース
@@ -58,6 +59,21 @@ export class UpdateCreatorUseCase {
         const beforeData = await this.creatorRepository.getCreatorById(id);
         if (!beforeData) {
             throw new NotFoundCreatorError();
+        }
+
+        // 有害性チェック
+        if (updates.name) {
+            const isNameToxic = await isToxic(updates.name);
+            if (isNameToxic) {
+                throw new ValidationError("Creator name contains inappropriate content", {name: updates.name});
+            }
+        }
+
+        if (updates.description) {
+            const isDescriptionToxic = await isToxic(updates.description);
+            if (isDescriptionToxic) {
+                throw new ValidationError("Creator description contains inappropriate content", {description: updates.description});
+            }
         }
 
         // 特定フィールドのバリデーション

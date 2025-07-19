@@ -3,6 +3,7 @@ import {TagRepository} from "../../../repository/TagRepository/TagRepository";
 import {ValidationError} from "../../../base/error/ValidationError";
 import {NotFoundError} from "../../../base/error/NotFoundError";
 import {Timestamp} from "../../../lib/firebase/firebase";
+import {isToxic} from "../../../lib/perspective/perspective";
 
 /**
  * タグ更新ユースケース
@@ -31,6 +32,21 @@ export class UpdateTagUseCase {
         const currentTag = await this.tagRepository.getTagById(tagId);
         if (!currentTag) {
             throw new NotFoundError("Tag not found");
+        }
+
+        // 有害性チェック
+        if (updates.name) {
+            const isNameToxic = await isToxic(updates.name);
+            if (isNameToxic) {
+                throw new ValidationError("Tag name contains inappropriate content", {name: updates.name});
+            }
+        }
+
+        if (updates.description) {
+            const isDescriptionToxic = await isToxic(updates.description);
+            if (isDescriptionToxic) {
+                throw new ValidationError("Tag description contains inappropriate content", {description: updates.description});
+            }
         }
 
         // タグ名を変更する場合は重複チェック

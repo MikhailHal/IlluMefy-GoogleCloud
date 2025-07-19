@@ -4,6 +4,7 @@ import {ValidationError} from "../../../base/error/ValidationError";
 import {Timestamp} from "../../../lib/firebase/firebase";
 import {createEmbedding} from "../../../lib/openai/openai";
 import {FieldValue} from "@google-cloud/firestore";
+import {isToxic} from "../../../lib/perspective/perspective";
 
 /**
  * タグ作成ユースケース
@@ -27,6 +28,19 @@ export class CreateTagUseCase {
      * @throws {ValidationError} タグ名が重複している場合
      */
     public async execute(name: string, description?: string): Promise<string> {
+        // 有害性チェック
+        const isNameToxic = await isToxic(name);
+        if (isNameToxic) {
+            throw new ValidationError("Tag name contains inappropriate content", {name});
+        }
+
+        if (description) {
+            const isDescriptionToxic = await isToxic(description);
+            if (isDescriptionToxic) {
+                throw new ValidationError("Tag description contains inappropriate content", {description});
+            }
+        }
+
         // タグ名の重複チェック
         const existingTag = await this.tagRepository.getTagByName(name);
         if (existingTag) {
