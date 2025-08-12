@@ -1,6 +1,7 @@
 import {Request, Response, NextFunction} from "express";
 import {AuthRequest} from "../../middleware/auth";
 import {GetPopularCreatorsUseCase} from "../../domain/usecase/GetPopularCreator/GetPopularCreatorsUseCase";
+import {GetNewestCreatorsUseCase} from "../../domain/usecase/GetNewestCreators/GetNewestCreatorsUseCase";
 import {SearchCreatorsUseCase} from "../../domain/usecase/SearchCreators/SearchCreatorsUseCase";
 import {GetCreatorByIdUseCase} from "../../domain/usecase/GetCreatorById/GetCreatorByIdUseCase";
 import {CreateCreatorUseCase} from "../../domain/usecase/CreateCreator/CreateCreatorUseCase";
@@ -33,6 +34,38 @@ export const popularCreatorHandler = async (
         );
 
         const creators = await getPopularCreatorsUseCase.execute(limit);
+        res.json({
+            data: creators,
+        });
+    } catch (error) {
+        if (error instanceof ZodError) {
+            res.status(400).json({
+                error: {
+                    message: "Invalid limit parameter. Must be a number greater than 0",
+                },
+            });
+            return;
+        }
+        next(error);
+    }
+};
+
+export const newestCreatorsHandler = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+): Promise<void> => {
+    try {
+        const defaultLimitNum = 20;
+        const limit = req.query.limit ?
+            fetchNumSchema.parse(parseInt(req.query.limit as string)) :
+            defaultLimitNum;
+
+        const getNewestCreatorsUseCase = new GetNewestCreatorsUseCase(
+            new CreatorRepository()
+        );
+
+        const creators = await getNewestCreatorsUseCase.execute(limit);
         res.json({
             data: creators,
         });

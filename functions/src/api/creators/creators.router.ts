@@ -1,6 +1,7 @@
 import {Router} from "express";
 import {
     popularCreatorHandler,
+    newestCreatorsHandler,
     searchCreatorsHandler,
     getCreatorByIdHandler,
     createCreatorHandler,
@@ -18,6 +19,7 @@ const router = Router();
 
 // Public endpoints
 router.get("/popular", popularCreatorHandler);
+router.get("/newest", newestCreatorsHandler);
 router.get("/search", searchCreatorsHandler);
 router.get("/:id", getCreatorByIdHandler);
 router.get("/:id/edit-history", getCreatorEditHistoryHandler);
