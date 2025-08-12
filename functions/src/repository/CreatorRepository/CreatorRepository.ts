@@ -90,6 +90,25 @@ export class CreatorRepository {
     }
 
     /**
+     * 最新のクリエイターを返却する
+     * @param {number} fetchCount データ読み込み件数
+     * @return {Creator[]} 最新クリエイター
+     */
+    public async getNewestCreators(fetchCount: number): Promise<Creator[]> {
+        const snapshot = await this.collection
+            .orderBy("createdAt", "desc")
+            .limit(fetchCount)
+            .get();
+
+        const creators = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+        } as Omit<Creator, "tagNames">));
+
+        return this.enrichMultipleWithTagNames(creators);
+    }
+
+    /**
      * クリエイターの存在確認
      *
      * @param {string} id 確認対象のクリエイターid
