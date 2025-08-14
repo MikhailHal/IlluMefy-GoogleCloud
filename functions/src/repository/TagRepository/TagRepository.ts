@@ -28,6 +28,38 @@ export class TagRepository {
     }
 
     /**
+     * 複数のIDからタグを取得
+     * @param {string[]} idList 検索対象のタグid一覧
+     * @return {Tag[]} タグ情報一覧（存在しないIDは除外）
+     */
+    public async getTagByIdList(idList: string[]): Promise<Tag[]> {
+        if (idList.length === 0) {
+            return [];
+        }
+
+        // Firestoreの制限により最大10件ずつ処理
+        const chunkSize = 10;
+        const tags: Tag[] = [];
+
+        for (let i = 0; i < idList.length; i += chunkSize) {
+            const chunk = idList.slice(i, i + chunkSize);
+            const promises = chunk.map( (id) => this.collection.doc(id).get());
+            const docs = await Promise.all(promises);
+
+            docs.forEach( (doc) => {
+                if (doc.exists) {
+                    tags.push({
+                        id: doc.id,
+                        ...doc.data(),
+                    } as Tag);
+                }
+            });
+        }
+
+        return tags;
+    }
+
+    /**
      * 人気タグ取得
      *
      * @param {number} fetchCount 取得件数
