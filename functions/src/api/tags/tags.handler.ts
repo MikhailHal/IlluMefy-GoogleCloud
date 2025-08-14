@@ -1,12 +1,13 @@
 import {Request, Response, NextFunction} from "express";
 import {GetAllTagsUseCase} from "../../domain/usecase/GetAllTags/GetAllTagsUseCase";
 import {GetPopularTagsUseCase} from "../../domain/usecase/GetPopularTags/GetPopularTagsUseCase";
+import {GetTagsByIdListUseCase} from "../../domain/usecase/GetTagsByIdList/GetTagsByIdListUseCase";
 import {CreateTagUseCase} from "../../domain/usecase/CreateTag/CreateTagUseCase";
 import {UpdateTagUseCase} from "../../domain/usecase/UpdateTag/UpdateTagUseCase";
 import {DeleteTagUseCase} from "../../domain/usecase/DeleteTag/DeleteTagUseCase";
 import {TagRepository} from "../../repository/TagRepository/TagRepository";
 import {fetchNumSchema} from "../../domain/schema/common/fetchNum.schema";
-import {createTagBodySchema, updateTagBodySchema, tagIdParamsSchema} from "../../domain/schema/tag.schema";
+import {createTagBodySchema, updateTagBodySchema, tagIdParamsSchema, tagIdListBodySchema} from "../../domain/schema/tag.schema";
 import {ZodError} from "zod";
 
 export const getAllTagsHandler = async (
@@ -149,6 +150,39 @@ export const deleteTagHandler = async (
             res.status(400).json({
                 error: {
                     message: "Invalid tag ID format",
+                },
+            });
+            return;
+        }
+        next(error);
+    }
+};
+
+export const getTagListByIdListHandler = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+): Promise<void> => {
+    try {
+        const body = tagIdListBodySchema.parse(req.body);
+
+        const getTagsByIdListUseCase = new GetTagsByIdListUseCase(
+            new TagRepository()
+        );
+
+        const tags = await getTagsByIdListUseCase.execute(body.tagIds);
+        res.json({
+            data: tags,
+        });
+    } catch (error) {
+        if (error instanceof ZodError) {
+            res.status(400).json({
+                error: {
+                    message: "Invalid request parameters",
+                    details: error.errors.map((e) => ({
+                        field: e.path.join("."),
+                        message: e.message,
+                    })),
                 },
             });
             return;

@@ -37,3 +37,10 @@ export const updateTagBodySchema = z.object({
 export const tagIdParamsSchema = z.object({
     id: tagIdSchema,
 });
+
+/**
+ * タグIDリストボディスキーマ
+ */
+export const tagIdListBodySchema = z.object({
+    tagIds: z.array(tagIdSchema).min(1, "At least one tag ID is required").max(50, "Maximum 50 tag IDs allowed"),
+});
