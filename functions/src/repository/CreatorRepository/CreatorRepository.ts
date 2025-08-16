@@ -1,7 +1,7 @@
 import {Creator, CreatorDocument} from "../../models/creator";
 import {db} from "../../lib/firebase/firebase";
 import {TagRepository} from "../TagRepository/TagRepository";
-import {FieldValue, type Query} from "firebase-admin/firestore";
+import {FieldValue, type Query, WriteBatch} from "firebase-admin/firestore";
 import {FavoriteMode} from "../../util/enum/FavoriteMode";
 
 /**
@@ -178,20 +178,20 @@ export class CreatorRepository {
     /**
      * お気に入り操作の切り替え
      *
+     * @param {WriteBatch} batch Firestoreバッチ
      * @param {string} creatorId クリエイターId
      * @param {FavoriteMode} mode 切り替えモード
      */
-    public async toggleFavorite(
+    public toggleFavorite(
+        batch: WriteBatch,
         creatorId: string,
         mode: FavoriteMode,
-    ): Promise<void> {
+    ): void {
         const value = (mode == FavoriteMode.Add) ? 1 : -1;
-        const batch = db.batch();
         const doc = this.collection.doc(creatorId);
         batch.update(doc, {
             favoriteCount: FieldValue.increment(value),
             updatedAt: FieldValue.serverTimestamp(),
         });
-        await batch.commit();
     }
 }

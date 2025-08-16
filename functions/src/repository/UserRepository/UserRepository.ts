@@ -1,6 +1,6 @@
 import {db, FieldValue} from "../../lib/firebase/firebase";
 import {User, UserDocument} from "../../models/user";
-import {Timestamp} from "firebase-admin/firestore";
+import {Timestamp, WriteBatch} from "firebase-admin/firestore";
 import {FavoriteMode} from "../../util/enum/FavoriteMode";
 import {ValidationError} from "../../base/error/ValidationError";
 
@@ -94,30 +94,26 @@ export class UserRepository {
     /**
      * お気に入り操作の切り替え
      *
+     * @param {WriteBatch} batch Firestoreバッチ
      * @param {string} userId ユーザーId
      * @param {string} creatorId クリエイターId
      * @param {FavoriteMode} mode 切り替えモード
      */
-    public async toggleFavorite(
+    public toggleFavorite(
+        batch: WriteBatch,
         userId: string,
         creatorId: string,
         mode: FavoriteMode,
-    ): Promise<void> {
+    ): void {
         if (!userId || !creatorId) {
             throw new ValidationError("userId and creatorId are required.");
         }
         switch (mode) {
         case FavoriteMode.Add:
-            await this.addFavorite(
-                userId,
-                creatorId,
-            );
+            this.addFavorite(batch, userId, creatorId);
             break;
         case FavoriteMode.Remove:
-            await this.deleteFavorite(
-                userId,
-                creatorId,
-            );
+            this.deleteFavorite(batch, userId, creatorId);
             break;
         }
     }
@@ -125,19 +121,21 @@ export class UserRepository {
     /**
      * お気に入り追加
      *
+     * @param {WriteBatch} batch Firestoreバッチ
      * @param {string} userId ユーザーId
      * @param {string} creatorId クリエイターId
      */
-    private async addFavorite(
+    private addFavorite(
+        batch: WriteBatch,
         userId: string,
         creatorId: string,
-    ): Promise<void> {
+    ): void {
         const ref = this.collection
             .doc(userId)
             .collection("favorites")
             .doc(creatorId);
 
-        await ref.set({
+        batch.set(ref, {
             creatorId: creatorId,
             createdAt: FieldValue.serverTimestamp(),
         });
@@ -146,18 +144,21 @@ export class UserRepository {
     /**
      * お気に入り削除
      *
+     * @param {WriteBatch} batch Firestoreバッチ
      * @param {string} userId ユーザーId
      * @param {string} creatorId クリエイターId
      */
-    private async deleteFavorite(
+    private deleteFavorite(
+        batch: WriteBatch,
         userId: string,
         creatorId: string,
-    ): Promise<void> {
-        await this.collection
+    ): void {
+        const ref = this.collection
             .doc(userId)
             .collection("favorites")
-            .doc(creatorId)
-            .delete();
+            .doc(creatorId);
+        
+        batch.delete(ref);
     }
 
     /**
