@@ -1,7 +1,8 @@
 import {Creator, CreatorDocument} from "../../models/creator";
 import {db} from "../../lib/firebase/firebase";
 import {TagRepository} from "../TagRepository/TagRepository";
-import type {Query} from "firebase-admin/firestore";
+import {FieldValue, type Query} from "firebase-admin/firestore";
+import {FavoriteMode} from "../../util/enum/FavoriteMode";
 
 /**
  * クリエイターデータの基本操作に関するクラス
@@ -172,5 +173,25 @@ export class CreatorRepository {
             ).slice(0, fetchCount);
 
         return this.enrichMultipleWithTagNames(filteredCreators);
+    }
+
+    /**
+     * お気に入り操作の切り替え
+     *
+     * @param {string} creatorId クリエイターId
+     * @param {FavoriteMode} mode 切り替えモード
+     */
+    public async toggleFavorite(
+        creatorId: string,
+        mode: FavoriteMode,
+    ): Promise<void> {
+        const value = (mode == FavoriteMode.Add) ? 1 : -1;
+        const batch = db.batch();
+        const doc = this.collection.doc(creatorId);
+        batch.update(doc, {
+            favoriteCount: FieldValue.increment(value),
+            updatedAt: FieldValue.serverTimestamp(),
+        });
+        await batch.commit();
     }
 }

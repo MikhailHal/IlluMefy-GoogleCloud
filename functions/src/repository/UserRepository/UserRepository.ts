@@ -1,6 +1,8 @@
 import {db, FieldValue} from "../../lib/firebase/firebase";
 import {User, UserDocument} from "../../models/user";
-import type {Timestamp} from "firebase-admin/firestore";
+import {Timestamp} from "firebase-admin/firestore";
+import {FavoriteMode} from "../../util/enum/FavoriteMode";
+import {ValidationError} from "../../base/error/ValidationError";
 
 /**
  * ユーザーデータの基本操作に関するクラス
@@ -90,25 +92,72 @@ export class UserRepository {
     }
 
     /**
-     * クリエイターをお気に入りから削除する
+     * お気に入り操作の切り替え
      *
-     * @param {string} userId お気に入り削除操作を行うユーザーid
-     * @param {string} creatorId お気に入りから削除するクリエイターid
-     * @throws {Error} 元々クリエイター情報がお気に入りリストに追加されていなかった場合
+     * @param {string} userId ユーザーId
+     * @param {string} creatorId クリエイターId
+     * @param {FavoriteMode} mode 切り替えモード
      */
-    public async removeFavoriteCreator(
+    public async toggleFavorite(
         userId: string,
-        creatorId: string
+        creatorId: string,
+        mode: FavoriteMode,
     ): Promise<void> {
-        const user = await this.getUserById(userId);
-
-        if (!user.favoriteCreators.includes(creatorId)) {
-            throw new Error("Creator is not in favorites");
+        if (!userId || !creatorId) {
+            throw new ValidationError("userId and creatorId are required.");
         }
+        switch (mode) {
+        case FavoriteMode.Add:
+            await this.addFavorite(
+                userId,
+                creatorId,
+            );
+            break;
+        case FavoriteMode.Remove:
+            await this.deleteFavorite(
+                userId,
+                creatorId,
+            );
+            break;
+        }
+    }
 
-        await this.collection.doc(userId).update({
-            favoriteCreators: FieldValue.arrayRemove(creatorId),
+    /**
+     * お気に入り追加
+     *
+     * @param {string} userId ユーザーId
+     * @param {string} creatorId クリエイターId
+     */
+    private async addFavorite(
+        userId: string,
+        creatorId: string,
+    ): Promise<void> {
+        const ref = this.collection
+            .doc(userId)
+            .collection("favorites")
+            .doc(creatorId);
+
+        await ref.set({
+            creatorId: creatorId,
+            createdAt: FieldValue.serverTimestamp(),
         });
+    }
+
+    /**
+     * お気に入り削除
+     *
+     * @param {string} userId ユーザーId
+     * @param {string} creatorId クリエイターId
+     */
+    private async deleteFavorite(
+        userId: string,
+        creatorId: string,
+    ): Promise<void> {
+        await this.collection
+            .doc(userId)
+            .collection("favorites")
+            .doc(creatorId)
+            .delete();
     }
 
     /**
