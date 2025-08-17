@@ -157,7 +157,6 @@ export class UserRepository {
             .doc(userId)
             .collection("favorites")
             .doc(creatorId);
-        
         batch.delete(ref);
     }
 

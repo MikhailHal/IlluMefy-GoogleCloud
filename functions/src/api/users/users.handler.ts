@@ -1,9 +1,8 @@
 import {Response, NextFunction} from "express";
 import {AuthRequest} from "../../middleware/auth";
 import {GetUserFavoritesUseCase} from "../../domain/usecase/GetUserFavorites/GetUserFavoritesUseCase";
-import {
-    AddFavoriteCreatorUseCase,
-} from "../../domain/usecase/AddFavoriteCreator/AddFavoriteCreatorUseCase";
+import {ToggleFavoriteUseCase} from "../../domain/usecase/ToggleFavorite/ToggleFavoriteUseCase";
+import {FavoriteMode} from "../../util/enum/FavoriteMode";
 import {AddSearchHistoryUseCase} from "../../domain/usecase/AddSearchHistory/AddSearchHistoryUseCase";
 import {AddViewHistoryUseCase} from "../../domain/usecase/AddViewHistory/AddViewHistoryUseCase";
 import {GetUserEditHistoryUseCase} from "../../domain/usecase/GetUserEditHistory/GetUserEditHistoryUseCase";
@@ -60,12 +59,12 @@ export const addFavoriteHandler = async (
 
         const params = creatorIdParamsSchema.parse(req.params);
 
-        const addFavoriteCreatorUseCase = new AddFavoriteCreatorUseCase(
+        const toggleFavoriteUseCase = new ToggleFavoriteUseCase(
             new UserRepository(),
             new CreatorRepository()
         );
 
-        await addFavoriteCreatorUseCase.execute(req.user.uid, params.creatorId);
+        await toggleFavoriteUseCase.execute(req.user.uid, params.creatorId, FavoriteMode.Add);
         res.status(200).json({
             message: "Favorite added successfully",
         });
@@ -99,9 +98,12 @@ export const removeFavoriteHandler = async (
 
         const params = creatorIdParamsSchema.parse(req.params);
 
-        const userRepository = new UserRepository();
-        await userRepository.removeFavoriteCreator(req.user.uid, params.creatorId);
+        const toggleFavoriteUseCase = new ToggleFavoriteUseCase(
+            new UserRepository(),
+            new CreatorRepository()
+        );
 
+        await toggleFavoriteUseCase.execute(req.user.uid, params.creatorId, FavoriteMode.Remove);
         res.status(200).json({
             message: "Favorite removed successfully",
         });
