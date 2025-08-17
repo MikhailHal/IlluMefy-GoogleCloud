@@ -70,6 +70,27 @@ export class UserRepository {
     }
 
     /**
+     * お気に入り済みがどうか
+     *
+     * @param {string} userId ユーザーId
+     * @param {string} creatorId クリエイターId
+     * @return {Promise<boolean>} お気に入り済みかどうか
+     */
+    public async isFavorite(
+        userId: string,
+        creatorId: string,
+    ): Promise<boolean> {
+        if (!userId || !creatorId) {
+            throw new ValidationError("userId and creatorId are required.");
+        }
+        const doc = await this.collection
+            .doc(userId)
+            .collection("favorites")
+            .doc(creatorId)
+            .get();
+        return doc.exists;
+    }
+    /**
      * お気に入り操作の切り替え
      *
      * @param {WriteBatch} batch Firestoreバッチ
