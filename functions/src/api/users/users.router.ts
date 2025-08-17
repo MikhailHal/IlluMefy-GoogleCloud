@@ -5,7 +5,6 @@ import {
     addFavoriteHandler,
     removeFavoriteHandler,
     addSearchHistoryHandler,
-    addViewHistoryHandler,
     getUserEditHistoryHandler,
 } from "./users.handler";
 
@@ -19,7 +18,6 @@ router.get("/favorites", getUserFavoritesHandler);
 router.post("/favorites/:creatorId", addFavoriteHandler);
 router.delete("/favorites/:creatorId", removeFavoriteHandler);
 router.post("/search-history", addSearchHistoryHandler);
-router.post("/view-history/:creatorId", addViewHistoryHandler);
 router.get("/edit-history", getUserEditHistoryHandler);
 
 export default router;

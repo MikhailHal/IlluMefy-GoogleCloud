@@ -70,28 +70,6 @@ export class UserRepository {
     }
 
     /**
-     * クリエイターをお気に入り追加する
-     *
-     * @param {string} userId お気に入り追加操作を行うユーザーid
-     * @param {string} creatorId お気に入り追加するクリエイターid
-     * @throws {Error} 既にお気に入り追加されていた場合
-     */
-    public async addFavoriteCreator(
-        userId: string,
-        creatorId: string
-    ): Promise<void> {
-        const user = await this.getUserById(userId);
-
-        if (user.favoriteCreators.includes(creatorId)) {
-            throw new Error("Creator is already in favorites");
-        }
-
-        await this.collection.doc(userId).update({
-            favoriteCreators: FieldValue.arrayUnion(creatorId),
-        });
-    }
-
-    /**
      * お気に入り操作の切り替え
      *
      * @param {WriteBatch} batch Firestoreバッチ
@@ -188,37 +166,6 @@ export class UserRepository {
 
         await this.collection.doc(userId).update({
             searchTagHistories: updatedHistory,
-        });
-    }
-
-    /**
-     * 閲覧履歴を追加する（100件制限）
-     *
-     * @param {string} userId 閲覧履歴を追加するユーザーid
-     * @param {string} creatorId 閲覧したクリエイターのid
-     */
-    public async addViewHistory(
-        userId: string,
-        creatorId: string
-    ): Promise<void> {
-        const user = await this.getUserById(userId);
-        const viewEntry = {
-            creatorId: creatorId,
-            timestamp: FieldValue.serverTimestamp(),
-        };
-
-        let updatedHistory = [...user.viewCreatorHistories, viewEntry as unknown as {
-            creatorId: string;
-            timestamp: Timestamp;
-        }];
-
-        // 100件制限：古いものから削除
-        if (updatedHistory.length > 100) {
-            updatedHistory = updatedHistory.slice(-100);
-        }
-
-        await this.collection.doc(userId).update({
-            viewCreatorHistories: updatedHistory,
         });
     }
 }

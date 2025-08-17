@@ -4,7 +4,6 @@ import {GetUserFavoritesUseCase} from "../../domain/usecase/GetUserFavorites/Get
 import {ToggleFavoriteUseCase} from "../../domain/usecase/ToggleFavorite/ToggleFavoriteUseCase";
 import {FavoriteMode} from "../../util/enum/FavoriteMode";
 import {AddSearchHistoryUseCase} from "../../domain/usecase/AddSearchHistory/AddSearchHistoryUseCase";
-import {AddViewHistoryUseCase} from "../../domain/usecase/AddViewHistory/AddViewHistoryUseCase";
 import {GetUserEditHistoryUseCase} from "../../domain/usecase/GetUserEditHistory/GetUserEditHistoryUseCase";
 import {UserRepository} from "../../repository/UserRepository/UserRepository";
 import {CreatorRepository} from "../../repository/CreatorRepository/CreatorRepository";
@@ -154,44 +153,6 @@ export const addSearchHistoryHandler = async (
                         field: e.path.join("."),
                         message: e.message,
                     })),
-                },
-            });
-            return;
-        }
-        next(error);
-    }
-};
-
-export const addViewHistoryHandler = async (
-    req: AuthRequest,
-    res: Response,
-    next: NextFunction,
-): Promise<void> => {
-    try {
-        if (!req.user) {
-            res.status(401).json({
-                error: {
-                    message: "Unauthorized",
-                },
-            });
-            return;
-        }
-
-        const params = creatorIdParamsSchema.parse(req.params);
-
-        const addViewHistoryUseCase = new AddViewHistoryUseCase(
-            new UserRepository()
-        );
-
-        await addViewHistoryUseCase.execute(req.user.uid, params.creatorId);
-        res.json({
-            message: "View history recorded successfully",
-        });
-    } catch (error) {
-        if (error instanceof ZodError) {
-            res.status(400).json({
-                error: {
-                    message: "Invalid creator ID format",
                 },
             });
             return;
