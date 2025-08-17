@@ -2,6 +2,7 @@ import {Response, NextFunction} from "express";
 import {AuthRequest} from "../../middleware/auth";
 import {GetUserFavoritesUseCase} from "../../domain/usecase/GetUserFavorites/GetUserFavoritesUseCase";
 import {ToggleFavoriteUseCase} from "../../domain/usecase/ToggleFavorite/ToggleFavoriteUseCase";
+import {CheckAlreadyFavoriteCreatorUseCase} from "../../domain/usecase/CheckAlreadyFavoriteCreator/CheckAlreadyFavoriteCreatorUseCase";
 import {FavoriteMode} from "../../util/enum/FavoriteMode";
 import {AddSearchHistoryUseCase} from "../../domain/usecase/AddSearchHistory/AddSearchHistoryUseCase";
 import {GetUserEditHistoryUseCase} from "../../domain/usecase/GetUserEditHistory/GetUserEditHistoryUseCase";
@@ -37,6 +38,46 @@ export const getUserFavoritesHandler = async (
             data: favorites,
         });
     } catch (error) {
+        next(error);
+    }
+};
+
+export const checkAlradyFavoriteCreator = async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction,
+): Promise<void> => {
+    try {
+        if (!req.user) {
+            res.status(401).json({
+                error: {
+                    message: "Unauthorized",
+                },
+            });
+            return;
+        }
+
+        const params = creatorIdParamsSchema.parse(req.params);
+
+        const checkAlreadyFavoriteCreatorUseCase = new CheckAlreadyFavoriteCreatorUseCase(
+            new UserRepository()
+        );
+
+        const isFavorite = await checkAlreadyFavoriteCreatorUseCase.execute(req.user.uid, params.creatorId);
+        res.json({
+            data: {
+                isFavorite: isFavorite,
+            },
+        });
+    } catch (error) {
+        if (error instanceof ZodError) {
+            res.status(400).json({
+                error: {
+                    message: "Invalid creator ID format",
+                },
+            });
+            return;
+        }
         next(error);
     }
 };

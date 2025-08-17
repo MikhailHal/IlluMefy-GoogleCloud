@@ -4,6 +4,7 @@ import {
     getUserFavoritesHandler,
     addFavoriteHandler,
     removeFavoriteHandler,
+    checkAlradyFavoriteCreator,
     addSearchHistoryHandler,
     getUserEditHistoryHandler,
 } from "./users.handler";
@@ -17,6 +18,7 @@ router.use(verifyAuth);
 router.get("/favorites", getUserFavoritesHandler);
 router.post("/favorites/:creatorId", addFavoriteHandler);
 router.delete("/favorites/:creatorId", removeFavoriteHandler);
+router.get("/favorites/:creatorId/check", checkAlradyFavoriteCreator);
 router.post("/search-history", addSearchHistoryHandler);
 router.get("/edit-history", getUserEditHistoryHandler);
 
