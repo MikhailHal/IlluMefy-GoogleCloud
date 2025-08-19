@@ -255,3 +255,32 @@ export const getUserEditHistoryHandler = async (
         next(error);
     }
 };
+
+export const getUserFavoriteCreatorListHandler = async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction,
+): Promise<void> => {
+    try {
+        if (!req.user) {
+            res.status(401).json({
+                error: {
+                    message: "Unauthorized",
+                },
+            });
+            return;
+        }
+
+        const getUserFavoritesUseCase = new GetUserFavoritesUseCase(
+            new UserRepository(),
+            new CreatorRepository()
+        );
+
+        const favorites = await getUserFavoritesUseCase.execute(req.user.uid);
+        res.json({
+            data: favorites,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
