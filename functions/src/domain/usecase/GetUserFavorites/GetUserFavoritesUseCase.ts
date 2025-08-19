@@ -1,11 +1,12 @@
 import {Creator} from "../../../models/creator";
 import {UserRepository} from "../../../repository/UserRepository/UserRepository";
 import {CreatorRepository} from "../../../repository/CreatorRepository/CreatorRepository";
+import {GetUserFavoritesUseCaseInterface} from "./GetUserFavoritesUseCaseInterface";
 
 /**
  * ユーザーのお気に入りクリエイター取得ユースケース
  */
-export class GetUserFavoritesUseCase {
+export class GetUserFavoritesUseCase implements GetUserFavoritesUseCaseInterface {
     /**
      * コンストラクタ
      *
@@ -21,22 +22,20 @@ export class GetUserFavoritesUseCase {
      * お気に入りクリエイター取得処理
      *
      * @param {string} userId ユーザーID
-     * @return {Creator[]} お気に入りクリエイター一覧
+     * @return {Promise<Creator[]>} お気に入りクリエイター一覧
      */
     public async execute(userId: string): Promise<Creator[]> {
-        const user = await this.userRepository.getUserById(userId);
-        const creators: Creator[] = [];
-
-        for (const creatorId of user.favoriteCreators) {
-            const creator = await this.creatorRepository.getCreatorById(creatorId);
-            if (creator) {
-                creators.push(creator);
-            } else {
-                // クリエイターが削除されている場合はスキップ
-                console.warn(`Creator ${creatorId} not found, skipping`);
-            }
+        if (!userId) {
+            throw new Error("userId is required");
         }
 
+        const favoriteCreatorIds = await this.userRepository.getFavoriteCreatorList(userId);
+
+        if (favoriteCreatorIds.length === 0) {
+            return [];
+        }
+
+        const creators = await this.creatorRepository.getCreatorsByIds(favoriteCreatorIds);
         return creators;
     }
 }
