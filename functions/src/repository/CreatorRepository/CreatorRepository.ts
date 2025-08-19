@@ -1,7 +1,7 @@
 import {Creator, CreatorDocument} from "../../models/creator";
 import {db} from "../../lib/firebase/firebase";
 import {TagRepository} from "../TagRepository/TagRepository";
-import {FieldValue, type Query, WriteBatch} from "firebase-admin/firestore";
+import {FieldValue, FieldPath, type Query, WriteBatch} from "firebase-admin/firestore";
 import {FavoriteMode} from "../../util/enum/FavoriteMode";
 
 /**
@@ -139,6 +139,45 @@ export class CreatorRepository {
         } as Omit<Creator, "tagNames">;
 
         return this.enrichWithTagNames(creator);
+    }
+
+    /**
+     * 複数IDによるクリエイター一括取得
+     *
+     * @param {string[]} ids クリエイターIDの配列
+     * @return {Promise<Creator[]>} クリエイター配列（タグ名付き）
+     */
+    public async getCreatorsByIds(ids: string[]): Promise<Creator[]> {
+        if (!ids || ids.length === 0) {
+            return [];
+        }
+
+        const creators: Creator[] = [];
+
+        // 30件ずつに分割（Firestore whereIn の制限）
+        const chunkSize = 30;
+        for (let i = 0; i < ids.length; i += chunkSize) {
+            const chunk = ids.slice(i, i + chunkSize);
+
+            const snapshot = await this.collection
+                .where(FieldPath.documentId(), "in", chunk)
+                .get();
+
+            const chunkCreators = await Promise.all(
+                snapshot.docs.map(async (doc) => {
+                    const creator = {
+                        id: doc.id,
+                        ...doc.data(),
+                    } as Omit<Creator, "tagNames">;
+
+                    return this.enrichWithTagNames(creator);
+                })
+            );
+
+            creators.push(...chunkCreators);
+        }
+
+        return creators;
     }
 
     /**
