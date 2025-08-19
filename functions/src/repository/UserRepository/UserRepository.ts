@@ -189,4 +189,16 @@ export class UserRepository {
             searchTagHistories: updatedHistory,
         });
     }
+
+    /**
+     * お気に入りクリエイター一覧取得
+     * @param {string} userId ユーザーid
+     * @return {Promise<string[]>} クリエイターID配列
+     */
+    public async getFavoriteCreatorList(
+        userId: string
+    ): Promise<string[]> {
+        const snapshot = await this.collection.doc(userId).collection("favorites").get();
+        return snapshot.docs.map((doc) => doc.id);
+    }
 }
