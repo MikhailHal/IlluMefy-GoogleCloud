@@ -12,6 +12,7 @@ import {getSecret} from "./lib/secretManager/secretManager";
 import {initializeOpenAi} from "./lib/openai/openai";
 import {initializeYouTube} from "./lib/youtube/youtube";
 import {initializeAnthropic} from "./lib/anthropic/anthropic";
+import {initializeAlgolia} from "./lib/alogolia/algolia";
 
 const app = express();
 
@@ -21,9 +22,12 @@ const app = express();
         const openaiApiKey = await getSecret("openai-api-key");
         const youtubeDataApiKey = await getSecret("youtube-data-api-key");
         const anthropicApiKey = await getSecret("anthropic-api-key");
+        const algoliaAppId = await getSecret("algolia-application-id");
+        const algoliaWriteKey = await getSecret("algolia-write-api-key");
         initializeOpenAi(openaiApiKey);
         initializeYouTube(youtubeDataApiKey);
         initializeAnthropic(anthropicApiKey);
+        initializeAlgolia(algoliaAppId, algoliaWriteKey);
     } catch (error) {
         console.error("Failed to initialize api instance:", error);
         process.exit(1);
