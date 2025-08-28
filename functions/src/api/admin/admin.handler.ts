@@ -80,9 +80,13 @@ export const syncAllTagIntoAlgoliaHandler = async (
     next: NextFunction,
 ): Promise<void> => {
     try {
+        console.log("[SyncHandler] Starting tag sync to Algolia");
+
+        const tagRepository = new TagRepository();
+        const algoliaTagRepository = new AlgoliaTagRepository();
         const syncAllTagIntoAlgoliaUseCase = new SyncAllTagIntoAlgoliaUseCase(
-            new TagRepository(),
-            new AlgoliaTagRepository()
+            tagRepository,
+            algoliaTagRepository
         );
 
         await syncAllTagIntoAlgoliaUseCase.execute();
@@ -91,6 +95,7 @@ export const syncAllTagIntoAlgoliaHandler = async (
             message: "All tags synced to Algolia successfully",
         });
     } catch (error) {
+        console.error("[SyncHandler] Error occurred:", error);
         next(error);
     }
 };

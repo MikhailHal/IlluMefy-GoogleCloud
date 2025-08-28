@@ -35,7 +35,7 @@ export async function write<T extends Record<string, any>>(
     };
     try {
         await algolia.saveObject({indexName, body: rawPayload});
-        console.log("✅ Algolia test write successful!");
+        console.log(`[${TAG}] - Succeed to write data✅ !`);
     } catch (error) {
         console.error(`[${TAG}] - Failed to write object: ${objectId}`, error);
         throw new InternalServerError(`[${TAG}] - Failed to write to Algolia: ${error}`);

@@ -13,8 +13,14 @@ export class AlgoliaTagRepository implements IAlgoliaTagRepository {
      * @param {Tag[]} tagList 書き込みするタグ一覧
      */
     async syncTags(tagList: Tag[]): Promise<void> {
+        const tags = tagList.map((tag) => ({
+            id: tag.id,
+            name: tag.name,
+            viewCount: tag.viewCount,
+        }));
+
         await Promise.all(
-            tagList.map((tag) => write(this.INDEX_NAME, tag.id, tag))
+            tags.map((tag) => write(this.INDEX_NAME, tag.id, tag))
         );
     }
 
