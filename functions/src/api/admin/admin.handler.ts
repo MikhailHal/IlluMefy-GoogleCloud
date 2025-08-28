@@ -5,6 +5,9 @@ import {CreatorRepository} from "../../repository/CreatorRepository/CreatorRepos
 import {CreatorEditHistoryRepository} from "../../repository/CreatorEditHistoryRepository/CreatorEditHistoryRepository";
 import {createCreatorFromYouTubeBodySchema} from "../../domain/schema/youtube.schema";
 import {ZodError} from "zod";
+import {SyncAllTagIntoAlgoliaUseCase} from "../../domain/usecase/SyncAllTagIntoAlgolia/SyncAllTagIntoAlgoliaUseCase";
+import {TagRepository} from "../../repository/TagRepository/TagRepository";
+import {AlgoliaTagRepository} from "../../repository/AlgoliaTagRepository/AlgoliaTagRepository";
 
 /**
  * YouTubeチャンネルからクリエイター作成ハンドラー
@@ -60,6 +63,34 @@ export const createCreatorFromYouTubeHandler = async (
             });
             return;
         }
+        next(error);
+    }
+};
+
+/**
+ * 全タグをAlgoliaに同期ハンドラー
+ *
+ * @param {AuthRequest} _req リクエスト
+ * @param {Response} res レスポンス
+ * @param {NextFunction} next 次のミドルウェア
+ */
+export const syncAllTagIntoAlgoliaHandler = async (
+    _req: AuthRequest,
+    res: Response,
+    next: NextFunction,
+): Promise<void> => {
+    try {
+        const syncAllTagIntoAlgoliaUseCase = new SyncAllTagIntoAlgoliaUseCase(
+            new TagRepository(),
+            new AlgoliaTagRepository()
+        );
+
+        await syncAllTagIntoAlgoliaUseCase.execute();
+
+        res.status(200).json({
+            message: "All tags synced to Algolia successfully",
+        });
+    } catch (error) {
         next(error);
     }
 };
