@@ -1,6 +1,6 @@
 import {IAlgoliaTagRepository} from "./IAlgoliaTagRepository";
 import {Tag} from "../../models/tag";
-import {write} from "../../lib/alogolia/algolia";
+import {write, deleteIndex} from "../../lib/alogolia/algolia";
 
 /**
  * Algoliaタグリポジトリ
@@ -13,6 +13,8 @@ export class AlgoliaTagRepository implements IAlgoliaTagRepository {
      * @param {Tag[]} tagList 書き込みするタグ一覧
      */
     async syncTags(tagList: Tag[]): Promise<void> {
+        await deleteIndex(this.INDEX_NAME);
+
         const tags = tagList.map((tag) => ({
             id: tag.id,
             name: tag.name,

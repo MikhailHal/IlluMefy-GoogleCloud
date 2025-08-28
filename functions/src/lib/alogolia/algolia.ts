@@ -41,3 +41,20 @@ export async function write<T extends Record<string, any>>(
         throw new InternalServerError(`[${TAG}] - Failed to write to Algolia: ${error}`);
     }
 }
+
+/**
+ * インデックス削除処理
+ * @param {string} indexName インデックス名
+ */
+export async function deleteIndex(indexName: string): Promise<void> {
+    if (!algolia) {
+        throw new InternalServerError(`[${TAG}] - API key not initialized`);
+    }
+    try {
+        await algolia.deleteIndex({indexName});
+        console.log(`[${TAG}] - Succeed to delete index: ${indexName}✅`);
+    } catch (error) {
+        console.error(`[${TAG}] - Failed to delete index: ${indexName}`, error);
+        throw new InternalServerError(`[${TAG}] - Failed to delete index: ${error}`);
+    }
+}
