@@ -1,5 +1,6 @@
 import {SecretManagerServiceClient} from "@google-cloud/secret-manager";
 import {InternalServerError} from "../../base/error/InternalServerError";
+import admin from "firebase-admin";
 
 const TAG = "Secret Manager";
 const client = new SecretManagerServiceClient();
@@ -13,7 +14,8 @@ const client = new SecretManagerServiceClient();
 export async function getSecret(secretName:string): Promise<string> {
     try {
         console.log(`[${TAG}] - Start to fetch ${secretName} value info`);
-        const secretPath = `projects/405184515768/secrets/${secretName}/versions/latest`;
+        const projectId = admin.app().options.projectId;
+        const secretPath = `projects/${projectId}/secrets/${secretName}/versions/latest`;
         const [version] = await client.accessSecretVersion({
             name: secretPath,
         });
