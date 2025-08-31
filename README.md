@@ -1,76 +1,79 @@
 # IlluMefy Backend
-## 🛠️ Development Setup
 
-### Prerequisites
-- Node.js 22.0 or later
-- npm 9.0 or later
+IlluMefyクリエイター発見プラットフォームのサーバーサイドインフラストラクチャ。
+
+## 🛠️ 開発環境セットアップ
+
+### 前提条件
+- Node.js 22.0以上
+- npm 9.0以上
 - Firebase CLI
-- Google Cloud SDK (optional for advanced features)
+- Google Cloud SDK（高度な機能用、オプション）
 
-### Getting Started
+### セットアップ手順
 
-1. **Clone the repository**
+1. **リポジトリをクローン**
    ```bash
    git clone https://github.com/MikhailHal/IlluMefy-GoogleCloud.git
    cd IlluMefy-GoogleCloud
    ```
 
-2. **Install dependencies**
+2. **依存関係をインストール**
    ```bash
    npm install
    ```
 
-3. **Set up environment variables**
+3. **環境変数を設定**
    ```bash
    cp .env.example .env
-   # Edit .env with your Firebase and API keys
+   # .envファイルにFirebaseとAPIキーを設定
    ```
 
-4. **Install Firebase CLI**
+4. **Firebase CLIをインストール**
    ```bash
    npm install -g firebase-tools
    firebase login
    ```
 
-5. **Start local development**
+5. **ローカル開発を開始**
    ```bash
-   # Start Firebase emulators
+   # Firebaseエミュレーターを起動
    firebase emulators:start
    
-   # In another terminal, start the development server
+   # 別のターミナルで開発サーバーを起動
    npm run dev
    ```
 
-## What's this backend?
-IlluMefy Backend is the server-side infrastructure for the IlluMefy mobile application.  
-It provides RESTful APIs for creator discovery, tag management, and user interactions.  
-Built with Node.js and Firebase, it ensures scalable and real-time features for the community-driven folksonomy system.  
-The backend handles authentication, content filtering, and data management for both iOS and Android clients.
+## このバックエンドについて
+IlluMefy BackendはIlluMefyモバイルアプリケーションのサーバーサイドインフラストラクチャです。  
+クリエイター発見、タグ管理、ユーザーインタラクション用のRESTful APIを提供します。  
+Node.jsとFirebaseで構築され、コミュニティ主導のフォークソノミーシステムのためのスケーラブルでリアルタイムな機能を保証します。  
+バックエンドは認証、コンテンツフィルタリング、iOSおよびAndroidクライアント向けのデータ管理を処理します。
 
-## 🌟 Key Features
+## 🌟 主要機能
 
-* **RESTful API Design**: Clean and intuitive endpoints for all client needs
-* **Real-time Updates**: Firestore integration for instant data synchronization
-* **Scalable Architecture**: Serverless functions that auto-scale with demand
-* **Type Safety**: Full TypeScript implementation with Zod validation
-* **Security First**: Firebase Authentication and proper authorization checks
-* **Clean Architecture**: Layered architecture with use cases and repositories
-* **Smart Tag Management**: Vector search-powered duplicate detection and auto-correction
-* **AI-Powered Tag Generation**: Automatic tag creation from YouTube channels using Claude AI
-* **Web Search Integration**: Real-time web search for comprehensive creator information
-* **Content Moderation**: Perspective API integration for toxic content detection
-* **Edit History Tracking**: Complete audit trail for all content modifications
-* **Community-Driven**: User-editable tags with moderation and quality control
+* **RESTful API設計**: 全クライアントニーズに対応するクリーンで直感的なエンドポイント
+* **リアルタイム更新**: 即座のデータ同期のためのFirestore統合
+* **スケーラブルアーキテクチャ**: 需要に応じて自動スケールするサーバーレス関数
+* **型安全性**: Zodバリデーション付きの完全なTypeScript実装
+* **セキュリティ優先**: Firebase Authenticationと適切な認可チェック
+* **Clean Architecture**: ユースケースとリポジトリによる階層化アーキテクチャ
+* **スマートタグ管理**: ベクター検索駆動の重複検出と自動修正
+* **AI搭載タグ生成**: Claude AIを使用したYouTubeチャンネルからの自動タグ作成
+* **ウェブ検索統合**: 包括的なクリエイター情報のリアルタイムウェブ検索
+* **コンテンツモデレーション**: 有害コンテンツ検出のためのPerspective API統合
+* **編集履歴追跡**: 全てのコンテンツ変更の完全な監査証跡
+* **コミュニティ主導**: モデレーションと品質管理付きのユーザー編集可能タグ
 
-## 🚀 Our Vision
-The backend serves as the foundation for IlluMefy's community-driven discovery system, processing millions of tags and recommendations to help users find their perfect content creators.
+## 🚀 私たちのビジョン
+バックエンドはIlluMefyのコミュニティ主導の発見システムの基盤として機能し、数百万のタグとレコメンデーションを処理して、ユーザーが完璧なコンテンツクリエイターを見つけるのを支援します。
 
-## 🔍 Current Status
-IlluMefy Backend is under active development.  
-MVP features are being implemented for the upcoming beta release.
+## 🔍 現在のステータス
+IlluMefy Backendは活発に開発中です。  
+今後のベータリリースに向けてMVP機能が実装されています。
 
-## What are used in this backend?
-### Basic Information
+## このバックエンドで使用されているもの
+### 基本情報
 Runtime: Node.js 22  
 Language: TypeScript 4.9  
 Framework: 
@@ -81,7 +84,7 @@ Infrastructure: Firebase Functions
 Package Manager: npm  
 Linting: ESLint
 
-### Services & APIs
+### サービス・API
 * Firebase Admin SDK
 * Firebase Authentication
 * Firebase Functions
@@ -94,128 +97,71 @@ Linting: ESLint
 * Brave Search API
 * Google Perspective API
 
-### Libraries
+### ライブラリ
 #### Web Framework
-* Express.js - Fast, unopinionated web framework
-* CORS - Cross-Origin Resource Sharing middleware
+* Express.js - 高速で意見を持たないWebフレームワーク
+* CORS - クロスオリジンリソース共有ミドルウェア
 
-#### Validation & Types
-* TypeScript - Type-safe JavaScript development
-* Zod - Runtime type validation and schema definition
+#### バリデーション・型
+* TypeScript - 型安全なJavaScript開発
+* Zod - ランタイム型バリデーションとスキーマ定義
 
-#### Environment & Configuration
-* dotenv - Environment variable management
+#### 環境・設定
+* dotenv - 環境変数管理
 * firebase-functions - Firebase Functions SDK
 
-#### Development Tools
-* ESLint - Code quality and consistency
-* @typescript-eslint - TypeScript linting rules
-* Firebase Emulators - Local development environment
+#### 開発ツール
+* ESLint - コード品質と一貫性
+* @typescript-eslint - TypeScript リンティングルール
+* Firebase Emulators - ローカル開発環境
 
-### Architecture
-The backend follows Clean Architecture pattern:
-- **API Layer**: RESTful endpoints with Express.js
-- **Use Case Layer**: Business logic and orchestration
-- **Repository Layer**: Data access abstraction
-- **Domain Layer**: Entities, schemas, and validation
-- **Infrastructure Layer**: Firebase and external services
+### アーキテクチャ
+バックエンドはClean Architectureパターンに従います：
+- **API Layer**: Express.jsによるRESTfulエンドポイント
+- **Use Case Layer**: ビジネスロジックとオーケストレーション
+- **Repository Layer**: データアクセス抽象化
+- **Domain Layer**: エンティティ、スキーマ、バリデーション
+- **Infrastructure Layer**: Firebaseと外部サービス
 
-## 📚 API Documentation
+## 📚 APIドキュメンテーション
 
-### Authentication
-All API endpoints (except health check) require Firebase Authentication:
+### 認証
+すべてのAPIエンドポイント（ヘルスチェック以外）はFirebase Authenticationが必要です：
 ```
 Authorization: Bearer {idToken}
 ```
 
-### Main Endpoints
+### メインエンドポイント
 
-#### Creators
-- `GET /api/creators/popular` - Get popular creators
-- `GET /api/creators/search?q=tag1,tag2` - Search creators by tags
-- `GET /api/creators/:id` - Get creator details
+#### クリエイター
+- `GET /api/creators/popular` - 人気のクリエイターを取得
+- `GET /api/creators/search?q=tag1,tag2` - タグでクリエイターを検索
+- `GET /api/creators/:id` - クリエイター詳細を取得
 
-#### Users
-- `GET /api/users/favorites` - Get user's favorites
-- `POST /api/users/favorites/:creatorId` - Add to favorites
-- `DELETE /api/users/favorites/:creatorId` - Remove from favorites
-- `POST /api/users/search-history` - Record search history
-- `POST /api/users/view-history/:creatorId` - Record view history
+#### ユーザー
+- `GET /api/users/favorites` - ユーザーのお気に入りを取得
+- `POST /api/users/favorites/:creatorId` - お気に入りに追加
+- `DELETE /api/users/favorites/:creatorId` - お気に入りから削除
+- `POST /api/users/search-history` - 検索履歴を記録
+- `POST /api/users/view-history/:creatorId` - 閲覧履歴を記録
 
-#### Tags
-- `GET /api/tags` - Get all tags
-- `GET /api/tags/popular` - Get popular tags
-- `POST /api/tags` - Create new tag (with smart duplicate detection)
-- `PUT /api/tags/:id` - Update tag
-- `DELETE /api/tags/:id` - Delete tag
+#### タグ
+- `GET /api/tags` - 全タグを取得
+- `GET /api/tags/popular` - 人気のタグを取得
+- `POST /api/tags` - 新しいタグを作成（スマート重複検出付き）
+- `PUT /api/tags/:id` - タグを更新
+- `DELETE /api/tags/:id` - タグを削除
 
-#### Edit History
-- `GET /api/creators/:id/edit-history` - Get creator edit history
-- `GET /api/users/edit-history` - Get user's edit history
+#### 編集履歴
+- `GET /api/creators/:id/edit-history` - クリエイター編集履歴を取得
+- `GET /api/users/edit-history` - ユーザーの編集履歴を取得
 
-#### Admin
-- `POST /api/admin/creators` - Create new creator
-- `POST /api/admin/creators/youtube` - Create creator from YouTube channel URL (with AI tag generation)
-- `PUT /api/admin/creators/:id` - Update creator
-- `DELETE /api/admin/creators/:id` - Delete creator
+#### 管理者
+- `POST /api/admin/creators` - 新しいクリエイターを作成
+- `POST /api/admin/creators/youtube` - YouTube チャンネルURLからクリエイターを作成（AIタグ生成付き）
+- `PUT /api/admin/creators/:id` - クリエイターを更新
+- `DELETE /api/admin/creators/:id` - クリエイターを削除
 
-## 🤝 Contributing
-
-We welcome contributions to IlluMefy Backend! Here's how you can help:
-
-### How to Contribute
-
-1. **Fork the repository**
-   - Click the "Fork" button at the top of this repository
-
-2. **Create a feature branch**
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-
-3. **Make your changes**
-   - Follow the existing code style and patterns
-   - Add tests for new functionality
-   - Update documentation as needed
-
-4. **Run tests and linting**
-   ```bash
-   npm run lint
-   npm test
-   ```
-
-5. **Commit your changes**
-   ```bash
-   git commit -m "feat: Add your feature description"
-   ```
-
-6. **Push to your fork**
-   ```bash
-   git push origin feature/your-feature-name
-   ```
-
-7. **Create a Pull Request**
-   - Go to the original repository
-   - Click "New Pull Request"
-   - Select your fork and branch
-   - Describe your changes in detail
-
-### Code Guidelines
-
-- Follow TypeScript best practices
-- Use ESLint and Prettier configurations
-- Write comprehensive tests
-- Keep functions small and focused
-- Document complex logic
-- Use meaningful variable names
-
-### Reporting Issues
-
-- Use GitHub Issues to report bugs
-- Include API endpoint and request details
-- Attach error logs if available
-- Mention Node.js version and environment
-
-## Related URL
+## 関連URL
 ・[iOS App](https://github.com/MikhailHal/IlluMefy-iOS)  
 ・[Android App](https://github.com/MikhailHal/IlluMefy-Android)
