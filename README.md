@@ -48,6 +48,7 @@ Linting: ESLint
 * Anthropic Claude API
 * Brave Search API
 * Google Perspective API
+* Algolia
 
 ### ライブラリ
 #### Web Framework
