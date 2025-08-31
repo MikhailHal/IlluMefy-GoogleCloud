@@ -205,7 +205,7 @@ export class CreateCreatorFromYouTubeUseCase {
                         // 2. ベクトル類似度0.75以下の類似タグがあれば既存タグのIDを返す
                         // 3. 類似タグがなければ新規作成してIDを返す
                         const tagId = await createTagUseCase.createOrGetExisting(tagName, `${channelName}関連のタグ`);
-    
+
                         console.log(`[YouTube UseCase] - Tag processed: "${tagName}" -> ID: ${tagId}`);
                         return tagId;
                     } catch (error) {
